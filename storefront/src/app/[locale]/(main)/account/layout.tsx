@@ -1,19 +1,25 @@
 import { retrieveCustomer } from "@lib/data/customer"
-import { Toaster } from "@medusajs/ui"
-import LoginTemplate from "@modules/account/templates/login-template"
-import AccountLayout from "@modules/account/templates/account-layout"
+import AccountNav from "@modules/account/components/account-nav"
+import PhoneLogin from "@modules/account/components/phone-login"
 
-// Logged-out visitors see the login form on every /account page;
+// Logged-out visitors see the phone login on every /account page;
 // logged-in customers see the requested page.
-// (Plain layout instead of parallel routes, which fail to build in Next 15.3.)
 export default async function AccountPageLayout({ children }: { children: React.ReactNode }) {
   const customer = await retrieveCustomer().catch(() => null)
 
+  if (!customer) {
+    return (
+      <div className="content-container">
+        <PhoneLogin />
+      </div>
+    )
+  }
+
   return (
-    <AccountLayout customer={customer}>
-      {customer ? children : <LoginTemplate />}
-      <Toaster />
-    </AccountLayout>
+    <div className="content-container py-6 small:grid small:grid-cols-[200px_1fr] small:gap-12 small:py-12" data-testid="account-page">
+      <AccountNav />
+      <div>{children}</div>
+    </div>
   )
 }
 

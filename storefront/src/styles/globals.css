@@ -78,6 +78,16 @@
     @apply text-xs font-medium uppercase tracking-[0.18em] text-muted;
   }
 
+  /* Letter spacing splits joined Devanagari letters: keep it for English only */
+  :lang(mr) :is(.eyebrow, .tracking-wide, .btn-primary, .btn-accent, .btn-outline),
+  :lang(hi) :is(.eyebrow, .tracking-wide, .btn-primary, .btn-accent, .btn-outline) {
+    letter-spacing: normal;
+  }
+  :lang(mr) .eyebrow,
+  :lang(hi) .eyebrow {
+    @apply text-[13px];
+  }
+
   .heading-xl {
     @apply font-heading text-[2rem] leading-[1.15] small:text-5xl;
   }

@@ -11,7 +11,7 @@ import ProductCardClient from "./product-card-client"
 /** Saved products, read from this browser's wishlist. */
 export default function WishlistView() {
   const { locale, t } = useI18n()
-  const { handles } = useWishlist()
+  const { handles, inAccount } = useWishlist()
   const [products, setProducts] = useState<HttpTypes.StoreProduct[] | null>(null)
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function WishlistView() {
   }
   return (
     <>
-      <p className="mb-6 text-sm text-muted">{t.wishlist.note}</p>
+      {!inAccount && <p className="mb-6 text-sm text-muted">{t.wishlist.note}</p>}
       <ul className="grid grid-cols-2 gap-x-2 gap-y-8 small:grid-cols-3 small:gap-x-4 medium:grid-cols-4" data-testid="wishlist-items">
         {saved.map((p) => (
           <li key={p.id}>
