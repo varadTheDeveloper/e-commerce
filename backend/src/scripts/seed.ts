@@ -37,6 +37,7 @@ import {
   LOCALES,
   PRODUCTS,
 } from "./data/catalogue";
+import DEMO_PHOTOS from "./data/demo-photos.json";
 
 const updateStoreCurrencies = createWorkflow(
   "update-store-currencies",
@@ -363,10 +364,12 @@ type SeedIds = {
 
 const DEFAULT_STOCK = 40;
 
-function imageBaseUrl() {
-  const backend = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000";
-  return process.env.DEMO_IMAGE_BASE_URL || `${backend}/static/demo`;
-}
+type DemoPhoto = {
+  url: string;
+  alt: string | null;
+  credit: { name: string; profile: string; photo: string };
+};
+const PHOTOS = DEMO_PHOTOS as Record<string, DemoPhoto[]>;
 
 async function seedCatalogue(container: ExecArgs["container"], ids: SeedIds) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -426,14 +429,25 @@ async function seedCatalogue(container: ExecArgs["container"], ids: SeedIds) {
   );
 
   logger.info("Seeding products...");
-  const base = imageBaseUrl();
   const { result: products } = await createProductsWorkflow(container).run({
     input: {
       products: PRODUCTS.map((p) => {
-        const images = p.colours.flatMap((colour) => [
-          { url: `${base}/${p.garment}-${colour}.webp` },
-          { url: `${base}/${p.garment}-${colour}-detail.webp` },
-        ]);
+        // Each picture remembers its colour and photographer (shown on the credits page).
+        const images = p.colours.flatMap((colour) =>
+          (PHOTOS[`${p.handle}/${colour}`] ?? []).map((photo) => ({
+            url: photo.url,
+            metadata: {
+              colour,
+              alt: photo.alt,
+              credit_name: photo.credit.name,
+              credit_profile: photo.credit.profile,
+              credit_photo: photo.credit.photo,
+            },
+          }))
+        );
+        if (!images.length) {
+          throw new Error(`No demo photos for ${p.handle}`);
+        }
         return {
           title: p.title.en,
           handle: p.handle,
@@ -450,7 +464,7 @@ async function seedCatalogue(container: ExecArgs["container"], ids: SeedIds) {
           category_ids: p.categories.map((h) => categoryIds[h]),
           thumbnail: images[0].url,
           images,
-          metadata: { ...p.metadata, garment: p.garment, collections: p.collections ?? [] },
+          metadata: { ...p.metadata, badge: p.badge, collections: p.collections ?? [] },
           options: [
             { title: "Size", values: p.sizes },
             { title: "Colour", values: p.colours },

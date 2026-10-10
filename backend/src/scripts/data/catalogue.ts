@@ -1,6 +1,10 @@
 /**
  * Demo catalogue used by `yarn seed`. Replace with the brand's real products.
  *
+ * Pictures come from Unsplash (free licence) and are listed in demo-photos.json
+ * under "<handle>/<colour>", with photographer credits. They are stand-ins only:
+ * before launch every product must show the brand's own photos.
+ *
  * Base text (stored on the product) is English (en-IN). Hindi (hi-IN) and
  * Marathi (mr-IN) go into Medusa's translation module.
  * The Hindi/Marathi wording must be reviewed by a native speaker.
@@ -27,7 +31,8 @@ export type ProductDef = {
   handle: string
   categories: string[]
   collections?: string[]
-  garment: "tshirt" | "shirt" | "kurta" | "jeans" | "dress" | "hoodie" | "joggers"
+  /** Small tag on product cards */
+  badge?: "bestseller"
   colours: string[]
   sizes: string[]
   mrp: number
@@ -85,8 +90,7 @@ export const PRODUCTS: ProductDef[] = [
     handle: "classic-crew-t-shirt",
     categories: ["men-t-shirts"],
     collections: ["new-arrivals"],
-    garment: "tshirt",
-    colours: ["black", "white", "navy"],
+    colours: ["black", "white"],
     sizes: ADULT,
     mrp: 799,
     price: 499,
@@ -103,13 +107,13 @@ export const PRODUCTS: ProductDef[] = [
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
     metadata: { fabric: "cotton", fit: "regular", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN" },
-    stock: { "XXL/navy": 0, "S/white": 3 },
+    stock: { "XXL/black": 0, "S/white": 3 },
+    badge: "bestseller",
   },
   {
     handle: "slim-fit-oxford-shirt",
     categories: ["men-shirts"],
     collections: ["new-arrivals"],
-    garment: "shirt",
     colours: ["white", "sky-blue"],
     sizes: ADULT,
     mrp: 1599,
@@ -132,8 +136,7 @@ export const PRODUCTS: ProductDef[] = [
   {
     handle: "linen-blend-casual-shirt",
     categories: ["men-shirts"],
-    garment: "shirt",
-    colours: ["olive", "beige"],
+    colours: ["beige", "navy", "grey"],
     sizes: ADULT,
     mrp: 1999,
     price: 1299,
@@ -159,7 +162,6 @@ export const PRODUCTS: ProductDef[] = [
     handle: "cotton-straight-kurta",
     categories: ["men-kurtas"],
     collections: ["festive"],
-    garment: "kurta",
     colours: ["white", "maroon", "mustard"],
     sizes: ADULT,
     mrp: 1499,
@@ -182,8 +184,7 @@ export const PRODUCTS: ProductDef[] = [
     handle: "festive-silk-blend-kurta",
     categories: ["men-kurtas"],
     collections: ["festive", "new-arrivals"],
-    garment: "kurta",
-    colours: ["royal-blue", "maroon"],
+    colours: ["royal-blue", "pink"],
     sizes: ADULT,
     mrp: 2999,
     price: 1799,
@@ -205,8 +206,7 @@ export const PRODUCTS: ProductDef[] = [
   {
     handle: "slim-fit-stretch-jeans",
     categories: ["men-jeans"],
-    garment: "jeans",
-    colours: ["indigo", "black"],
+    colours: ["indigo"],
     sizes: ["28", "30", "32", "34", "36"],
     mrp: 1999,
     price: 1199,
@@ -227,14 +227,14 @@ export const PRODUCTS: ProductDef[] = [
       mr: "डेनिम (98% कॉटन, 2% इलास्टेन)",
     },
     metadata: { fabric: "denim", fit: "slim", size_chart: "men-bottom", care: "machine-cold", country_of_origin: "IN" },
-    stock: { "36/black": 0 },
+    stock: { "36/indigo": 0 },
+    badge: "bestseller",
   },
   {
     handle: "womens-a-line-rayon-kurta",
     categories: ["women-kurtas"],
     collections: ["festive", "new-arrivals"],
-    garment: "kurta",
-    colours: ["pink", "teal"],
+    colours: ["pink", "white"],
     sizes: [...WOMEN, "XXL"],
     mrp: 1299,
     price: 799,
@@ -253,24 +253,23 @@ export const PRODUCTS: ProductDef[] = [
     metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN" },
   },
   {
-    handle: "fit-and-flare-midi-dress",
+    handle: "flowy-maxi-dress",
     categories: ["women-dresses"],
-    collections: ["new-arrivals"],
-    garment: "dress",
-    colours: ["red", "navy"],
+    collections: ["new-arrivals", "festive"],
+    colours: ["red"],
     sizes: WOMEN,
     mrp: 1799,
     price: 1099,
     weight: 300,
     title: {
-      en: "Fit & Flare Midi Dress",
-      hi: "फ़िट एंड फ़्लेयर मिडी ड्रेस",
-      mr: "फिट अँड फ्लेअर मिडी ड्रेस",
+      en: "Flowy Maxi Dress",
+      hi: "लहराती मैक्सी ड्रेस",
+      mr: "घेरदार मॅक्सी ड्रेस",
     },
     description: {
-      en: "A flattering fit-and-flare midi dress with a defined waist. Easy elegance for brunches and parties.",
-      hi: "कमर पर फ़िट और नीचे घेरदार मिडी ड्रेस। ब्रंच और पार्टियों के लिए सहज सुंदरता।",
-      mr: "कमरेला फिट आणि खाली घेरदार मिडी ड्रेस. ब्रंच आणि पार्ट्यांसाठी सहज सुंदर लूक.",
+      en: "A floor-length dress that flows with every step. Made for weddings, parties and evenings out.",
+      hi: "हर कदम के साथ लहराती, पूरी लंबाई की ड्रेस। शादियों, पार्टियों और शाम की सैर के लिए।",
+      mr: "प्रत्येक पावलासोबत लहरणारा, पूर्ण लांबीचा ड्रेस. लग्नसमारंभ, पार्ट्या आणि संध्याकाळच्या बाहेर फिरण्यासाठी.",
     },
     material: { en: "100% Rayon", hi: "100% रेयॉन", mr: "100% रेयॉन" },
     metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN" },
@@ -278,8 +277,7 @@ export const PRODUCTS: ProductDef[] = [
   {
     handle: "womens-everyday-cotton-t-shirt",
     categories: ["women-t-shirts"],
-    garment: "tshirt",
-    colours: ["white", "lavender"],
+    colours: ["white"],
     sizes: WOMEN,
     mrp: 699,
     price: 399,
@@ -301,8 +299,7 @@ export const PRODUCTS: ProductDef[] = [
     handle: "unisex-fleece-hoodie",
     categories: ["winterwear"],
     collections: ["new-arrivals"],
-    garment: "hoodie",
-    colours: ["grey", "black"],
+    colours: ["grey"],
     sizes: ADULT,
     mrp: 2499,
     price: 1499,
@@ -327,8 +324,7 @@ export const PRODUCTS: ProductDef[] = [
   {
     handle: "womens-cotton-joggers",
     categories: ["women-joggers"],
-    garment: "joggers",
-    colours: ["black", "grey"],
+    colours: ["grey", "red", "teal"],
     sizes: WOMEN,
     mrp: 1199,
     price: 699,
@@ -353,8 +349,7 @@ export const PRODUCTS: ProductDef[] = [
   {
     handle: "kids-cotton-t-shirt",
     categories: ["kids-t-shirts"],
-    garment: "tshirt",
-    colours: ["yellow", "sky-blue"],
+    colours: ["royal-blue", "lavender"],
     sizes: ["2-3Y", "4-5Y", "6-7Y", "8-9Y"],
     mrp: 499,
     price: 299,

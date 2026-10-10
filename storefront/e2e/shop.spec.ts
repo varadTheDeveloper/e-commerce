@@ -68,8 +68,8 @@ test("product: pick colour and size, add to bag", async ({ page }) => {
   await page.getByTestId("add-product-button").click()
   await expect(page.getByText("Please select a size")).toBeVisible()
 
-  // Navy XXL is sold out in the demo data
-  await page.getByTestId("colour-navy").click()
+  // Black XXL is sold out in the demo data
+  await page.getByTestId("colour-black").click()
   await expect(page.getByTestId("size-XXL")).toBeDisabled()
 
   // White S has only 3 left
@@ -96,6 +96,14 @@ test("product: size chart and pincode", async ({ page }) => {
   await page.getByTestId("pincode-input").fill("431203")
   await page.getByRole("button", { name: "Check" }).click()
   await expect(page.getByTestId("pincode-result")).toContainText("Delivery in")
+})
+
+test("wishlist: save from a product card and see it on the wishlist page", async ({ page }) => {
+  await page.goto("/en/categories/men-jeans")
+  await page.getByTestId("product-card").first().getByTestId("wishlist-toggle").click()
+  await page.goto("/en/wishlist")
+  await expect(page.getByTestId("wishlist-items").getByTestId("product-card")).toHaveCount(1)
+  await expect(page.getByTestId("wishlist-items")).toContainText("Jeans")
 })
 
 test("search finds English words on the Marathi site", async ({ page }) => {

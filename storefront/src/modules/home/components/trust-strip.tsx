@@ -9,11 +9,11 @@ export default function TrustStrip({ t }: { t: Dictionary }) {
     { icon: ShieldIcon, label: t.home.trustSecure },
   ]
   return (
-    <section className="content-container pt-6">
-      <ul className="grid grid-cols-2 gap-3 rounded-xl bg-surface p-4 small:grid-cols-4">
+    <section className="border-y border-line bg-white">
+      <ul className="content-container grid grid-cols-2 gap-y-4 py-5 small:grid-cols-4">
         {items.map(({ icon: Icon, label }) => (
-          <li key={label} className="flex items-center gap-2.5 text-[13px] font-medium small:justify-center small:text-sm">
-            <Icon size={22} className="shrink-0 text-brand-600" />
+          <li key={label} className="flex items-center gap-2.5 text-[13px] text-muted small:justify-center">
+            <Icon size={20} strokeWidth={1.5} className="shrink-0 text-ink" />
             {label}
           </li>
         ))}

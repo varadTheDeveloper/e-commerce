@@ -21,6 +21,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { BagIcon, CheckIcon } from "@modules/common/icons/ui"
 import { useMemo, useRef, useState, useTransition } from "react"
 import Price from "../price"
+import WishlistButton from "../wishlist-button"
 import Gallery from "./gallery"
 import PincodeCheck from "./pincode"
 import SizeChartButton from "./size-chart"
@@ -86,27 +87,27 @@ export default function ProductView({
   const soldOut = !!variant && !canBuy
 
   return (
-    <div className="small:grid small:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] small:gap-10">
-      <div className="small:sticky small:top-32 small:self-start">
+    <div className="small:grid small:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] small:gap-12">
+      <div>
         <Gallery images={images} alt={product.title ?? ""} />
       </div>
 
-      <div className="mt-4 flex flex-col gap-5 small:mt-0">
+      <div className="mt-5 flex flex-col gap-6 small:sticky small:top-36 small:mt-0 small:self-start">
         <div>
-          <h1 className="text-xl font-semibold leading-snug small:text-2xl" data-testid="pdp-title">
+          <h1 className="font-heading text-2xl leading-snug small:text-[1.75rem]" data-testid="pdp-title">
             {product.title}
           </h1>
           {price && (
             <div className="mt-2">
               <Price info={price} t={t} size="lg" />
-              <p className="mt-0.5 text-xs text-muted">{t.product.inclTaxes}</p>
+              <p className="mt-1 text-xs text-muted">{t.product.inclTaxes}</p>
             </div>
           )}
         </div>
 
         {colours.length > 0 && (
           <fieldset>
-            <legend className="mb-2 text-sm font-semibold">
+            <legend className="mb-3 text-sm">
               {format(t.product.selectColour, { colour: colour ? colourName(colour, locale) : "" })}
             </legend>
             <div className="flex flex-wrap gap-2.5">
@@ -124,7 +125,7 @@ export default function ProductView({
                     aria-pressed={on}
                     aria-label={colourName(c, locale)}
                     title={colourName(c, locale)}
-                    className={`relative h-16 w-[52px] overflow-hidden rounded-lg border-2 ${on ? "border-brand-600" : "border-line hover:border-muted"}`}
+                    className={`relative h-[72px] w-[58px] overflow-hidden border ${on ? "border-ink ring-1 ring-ink" : "border-line hover:border-muted"}`}
                     style={{ backgroundColor: colourHex(c) }}
                     data-testid={`colour-${c}`}
                   >
@@ -143,10 +144,10 @@ export default function ProductView({
         {sizes.length > 0 && (
           <fieldset ref={sizesRef}>
             <div className="mb-2 flex items-center justify-between">
-              <legend className="text-sm font-semibold">{t.product.selectSize}</legend>
+              <legend className="text-sm">{t.product.selectSize}</legend>
               <SizeChartButton chartKey={product.metadata?.size_chart as string | undefined} />
             </div>
-            <div className="flex flex-wrap gap-2.5" role="radiogroup" aria-label={t.product.selectSize}>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t.product.selectSize}>
               {[...sizes].sort(compareSizes).map((s) => {
                 const v = variantFor(colour, s)
                 const available = !!v && isVariantInStock(v)
@@ -163,9 +164,9 @@ export default function ProductView({
                       setSizeError(false)
                       setAdded(false)
                     }}
-                    className={`relative h-12 min-w-[3.25rem] rounded-full border px-3 text-[15px] font-medium transition-colors ${
+                    className={`relative h-12 min-w-[3.5rem] border px-3 text-[14px] transition-colors ${
                       on
-                        ? "border-brand-600 bg-brand-600 text-white"
+                        ? "border-ink bg-ink text-white"
                         : available
                         ? "border-line bg-white hover:border-ink"
                         : "cursor-not-allowed border-line bg-surface text-muted line-through"
@@ -181,7 +182,7 @@ export default function ProductView({
             <div aria-live="polite" className="mt-2 min-h-[1.25rem] text-sm">
               {sizeError && <p className="text-danger">{t.product.pleaseSelectSize}</p>}
               {!sizeError && stock !== undefined && stock > 0 && stock <= LOW_STOCK && (
-                <p className="font-semibold text-danger" data-testid="low-stock">
+                <p className="text-saving" data-testid="low-stock">
                   {format(t.product.onlyLeft, { count: stock })}
                 </p>
               )}
@@ -193,7 +194,7 @@ export default function ProductView({
         <div className="fixed inset-x-0 bottom-14 z-30 border-t border-line bg-white p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] small:static small:border-0 small:p-0">
           <div className="flex gap-3">
             {added ? (
-              <LocalizedClientLink href="/cart" className="btn-accent flex-1" data-testid="go-to-bag">
+              <LocalizedClientLink href="/cart" prefetch={false} className="btn-accent flex-1" data-testid="go-to-bag">
                 <CheckIcon size={20} />
                 {t.product.goToBag}
               </LocalizedClientLink>
@@ -205,10 +206,11 @@ export default function ProductView({
                 className="btn-primary flex-1"
                 data-testid="add-product-button"
               >
-                <BagIcon size={20} />
+                <BagIcon size={20} strokeWidth={1.6} />
                 {soldOut ? t.product.outOfStock : addLabel}
               </button>
             )}
+            <WishlistButton handle={product.handle!} variant="button" />
           </div>
           {error && <p className="mt-2 text-sm text-danger" role="alert">{error}</p>}
         </div>

@@ -8,14 +8,14 @@ import { useEffect, useRef, useState } from "react"
 
 /**
  * Phones: swipe through full-width pictures with dots.
- * Computers: thumbnails on the left, large picture, zoom on hover.
+ * Computers: all pictures in a two-column grid, zoom on hover.
  * Tap/click opens a full-screen view.
  */
 export default function Gallery({ images, alt }: { images: string[]; alt: string }) {
   const { t } = useI18n()
   const [active, setActive] = useState(0)
   const [zoomOpen, setZoomOpen] = useState(false)
-  const [origin, setOrigin] = useState<string | null>(null)
+  const [origin, setOrigin] = useState<{ i: number; at: string } | null>(null)
   const track = useRef<HTMLDivElement>(null)
 
   // New colour = new picture set: start from the first one
@@ -41,29 +41,11 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
   }
 
   if (!images.length) {
-    return <div className="aspect-[4/5] rounded-xl bg-surface" />
+    return <div className="aspect-[4/5] bg-surface" />
   }
 
   return (
-    <div className="small:grid small:grid-cols-[72px_1fr] small:gap-3">
-      <ul className="hidden flex-col gap-3 small:flex">
-        {images.map((src, i) => (
-          <li key={src}>
-            <button
-              type="button"
-              onClick={() => setActive(i)}
-              className={`relative block aspect-[4/5] w-full overflow-hidden rounded-md bg-surface ring-2 ${
-                i === active ? "ring-brand-600" : "ring-transparent hover:ring-line"
-              }`}
-              aria-label={format(t.product.image, { n: i + 1, total: images.length })}
-              aria-current={i === active}
-            >
-              <Image src={src} alt="" fill sizes="72px" className="object-cover" />
-            </button>
-          </li>
-        ))}
-      </ul>
-
+    <div>
       {/* Phones */}
       <div className="relative -mx-4 small:hidden">
         <div
@@ -76,7 +58,10 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
             <button
               key={src}
               type="button"
-              onClick={() => setZoomOpen(true)}
+              onClick={() => {
+                setActive(i)
+                setZoomOpen(true)
+              }}
               className="relative aspect-[4/5] w-full shrink-0 snap-center bg-surface"
               aria-label={t.product.zoom}
             >
@@ -87,34 +72,42 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
         {images.length > 1 && (
           <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5" aria-hidden="true">
             {images.map((src, i) => (
-              <span key={src} className={`h-1.5 rounded-full transition-all ${i === active ? "w-5 bg-ink" : "w-1.5 bg-ink/30"}`} />
+              <span key={src} className={`h-1.5 rounded-full transition-all ${i === active ? "w-5 bg-white" : "w-1.5 bg-white/60"}`} />
             ))}
           </div>
         )}
       </div>
 
-      {/* Computers */}
-      <button
-        type="button"
-        onClick={() => setZoomOpen(true)}
-        onMouseMove={(e) => {
-          const r = e.currentTarget.getBoundingClientRect()
-          setOrigin(`${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`)
-        }}
-        onMouseLeave={() => setOrigin(null)}
-        className="relative hidden aspect-[4/5] w-full cursor-zoom-in overflow-hidden rounded-xl bg-surface small:block"
-        aria-label={t.product.zoom}
-      >
-        <Image
-          src={images[active]}
-          alt={alt}
-          fill
-          priority
-          sizes="(max-width: 1280px) 50vw, 640px"
-          className="object-cover transition-transform duration-200"
-          style={origin ? { transform: "scale(1.8)", transformOrigin: origin } : undefined}
-        />
-      </button>
+      {/* Computers: every picture, two per row; hover to zoom, click for full screen */}
+      <div className={`hidden gap-1 small:grid ${images.length > 1 ? "small:grid-cols-2" : "max-w-[620px]"}`}>
+        {images.map((src, i) => (
+          <button
+            key={src}
+            type="button"
+            onClick={() => {
+              setActive(i)
+              setZoomOpen(true)
+            }}
+            onMouseMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect()
+              setOrigin({ i, at: `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%` })
+            }}
+            onMouseLeave={() => setOrigin(null)}
+            className="relative aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-surface"
+            aria-label={`${t.product.zoom} – ${format(t.product.image, { n: i + 1, total: images.length })}`}
+          >
+            <Image
+              src={src}
+              alt={i === 0 ? alt : ""}
+              fill
+              priority={i < 2}
+              sizes="(max-width: 1280px) 30vw, 420px"
+              className="object-cover transition-transform duration-200"
+              style={origin?.i === i ? { transform: "scale(1.7)", transformOrigin: origin.at } : undefined}
+            />
+          </button>
+        ))}
+      </div>
 
       {zoomOpen && (
         <div className="fixed inset-0 z-[120] flex flex-col bg-white" role="dialog" aria-modal="true" aria-label={t.product.zoom}>
@@ -135,7 +128,7 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
                 key={src}
                 type="button"
                 onClick={() => setActive(i)}
-                className={`relative h-16 w-12 overflow-hidden rounded ring-2 ${i === active ? "ring-brand-600" : "ring-transparent"}`}
+                className={`relative h-16 w-12 overflow-hidden ring-1 ${i === active ? "ring-ink" : "ring-transparent"}`}
                 aria-label={format(t.product.image, { n: i + 1, total: images.length })}
               >
                 <Image src={src} alt="" fill sizes="48px" className="object-cover" />

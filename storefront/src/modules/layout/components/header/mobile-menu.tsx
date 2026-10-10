@@ -40,7 +40,7 @@ export default function MobileMenu({ categories }: { categories: NavCategory[] }
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface small:hidden"
+        className="flex h-10 w-10 items-center justify-center hover:opacity-70 small:hidden"
         aria-label={t.common.menu}
         aria-expanded={open}
         data-testid="mobile-menu-button"
@@ -53,11 +53,11 @@ export default function MobileMenu({ categories }: { categories: NavCategory[] }
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <nav className="absolute inset-y-0 left-0 flex w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-line px-4 h-14">
-              <span className="text-lg font-semibold">{t.common.categories}</span>
+              <span className="font-heading text-xl">{t.common.categories}</span>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-surface"
+                className="flex h-10 w-10 items-center justify-center hover:opacity-70"
                 aria-label={t.common.close}
               >
                 <CloseIcon />
@@ -69,7 +69,7 @@ export default function MobileMenu({ categories }: { categories: NavCategory[] }
                 <li key={cat.handle} className="border-b border-line/60">
                   <LocalizedClientLink
                     href={`/categories/${cat.handle}`}
-                    className="flex items-center justify-between px-4 py-3.5 text-base font-semibold"
+                    className="flex items-center justify-between px-4 py-3.5 text-base font-medium"
                   >
                     {cat.name}
                     <ChevronRightIcon size={18} className="text-muted" />

@@ -55,14 +55,14 @@ export default function Listing({
   moreParams.set("page", String(page + 1))
 
   return (
-    <div className="content-container py-4 small:py-6">
+    <div className="content-container py-5 small:py-10">
       <nav aria-label="Breadcrumb" className="mb-2 text-[13px] text-muted">
         <ol className="flex flex-wrap items-center gap-1">
           {crumbs.map((c, i) => (
             <li key={i} className="flex items-center gap-1">
               {i > 0 && <ChevronRightIcon size={14} />}
               {c.href ? (
-                <LocalizedClientLink href={c.href} className="hover:text-brand-700">
+                <LocalizedClientLink href={c.href} className="hover:text-ink">
                   {c.label}
                 </LocalizedClientLink>
               ) : (
@@ -75,10 +75,10 @@ export default function Listing({
         </ol>
       </nav>
 
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-        <h1 className="text-2xl font-semibold small:text-3xl" data-testid="listing-title">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
+        <h1 className="heading-lg" data-testid="listing-title">
           {title}{" "}
-          <span className="text-base font-normal text-muted" data-testid="result-count">
+          <span className="font-sans text-sm text-muted" data-testid="result-count">
             {matching.length === 1 ? t.listing.resultsOne : format(t.listing.results, { count: matching.length })}
           </span>
         </h1>
@@ -89,7 +89,7 @@ export default function Listing({
         <ul className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 small:mx-0 small:px-0">
           {subcategories.map((s) => (
             <li key={s.handle} className="shrink-0">
-              <LocalizedClientLink href={`/categories/${s.handle}`} className="chip">
+              <LocalizedClientLink href={`/categories/${s.handle}`} className="chip h-9 text-[13px]">
                 {s.name}
               </LocalizedClientLink>
             </li>
@@ -97,13 +97,13 @@ export default function Listing({
         </ul>
       )}
 
-      <div className="small:grid small:grid-cols-[240px_1fr] small:gap-8">
+      <div className="small:grid small:grid-cols-[220px_1fr] small:gap-10">
         <ListingFilters facets={facets} filters={filters} sort={sort} total={matching.length} keep={keep} />
         <div>
           {shown.length > 0 ? (
             <ProductGrid products={shown} locale={locale} t={t} />
           ) : (
-            <div className="flex flex-col items-center gap-4 rounded-xl bg-surface px-6 py-16 text-center">
+            <div className="flex flex-col items-center gap-4 bg-surface px-6 py-16 text-center">
               <p className="text-muted">{t.listing.noResults}</p>
               {activeFilterCount(filters) > 0 && (
                 <LocalizedClientLink href={path} className="btn-outline">
@@ -114,7 +114,7 @@ export default function Listing({
           )}
           {matching.length > shown.length && (
             <div className="mt-8 flex justify-center">
-              <a href={`?${moreParams.toString()}`} className="btn-outline px-10">
+              <a href={`?${moreParams.toString()}`} className="btn-outline px-12">
                 {t.listing.loadMore}
               </a>
             </div>

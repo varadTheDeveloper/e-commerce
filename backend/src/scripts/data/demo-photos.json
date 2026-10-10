@@ -1,0 +1,472 @@
+{
+  "classic-crew-t-shirt/black": [
+    {
+      "id": "zneickOATGk",
+      "url": "https://images.unsplash.com/photo-1666358777322-a25eda95848f?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8Nnx8bWFuJTIwYmxhY2slMjB0LXNoaXJ0fGVufDF8MXx8fDE3OTE2NTA2OTd8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "a man wearing a black shirt",
+      "credit": {
+        "name": "Or Hakim",
+        "profile": "https://unsplash.com/@orhakim?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-wearing-a-black-shirt-zneickOATGk?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "pYDQyzThtLE",
+      "url": "https://images.unsplash.com/photo-1726140872004-850c80900ae3?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8bWFuJTIwYmxhY2slMjB0LXNoaXJ0fGVufDF8MXx8fDE3OTE2NTA2OTd8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A young man standing on a skateboard on a city street",
+      "credit": {
+        "name": "Tim Bernhard",
+        "profile": "https://unsplash.com/@bernhardvisuals?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-young-man-standing-on-a-skateboard-on-a-city-street-pYDQyzThtLE?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "classic-crew-t-shirt/white": [
+    {
+      "id": "bcRtywoae40",
+      "url": "https://images.unsplash.com/photo-1663573689907-23811551910b?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8OHx8bWFuJTIwd2hpdGUlMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg2fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9d9d9",
+      "alt": "a man with long hair",
+      "credit": {
+        "name": "Mediamodifier",
+        "profile": "https://unsplash.com/@mediamodifier?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-with-long-hair-bcRtywoae40?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "PGWXzt21X64",
+      "url": "https://images.unsplash.com/photo-1661181475147-bbd20ef65781?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8OXx8bWFuJTIwd2hpdGUlMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg2fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "a man wearing sunglasses",
+      "credit": {
+        "name": "Mediamodifier",
+        "profile": "https://unsplash.com/@mediamodifier?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-wearing-sunglasses-PGWXzt21X64?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "slim-fit-oxford-shirt/white": [
+    {
+      "id": "20oegq2JDYU",
+      "url": "https://images.unsplash.com/photo-1612541122840-bf7071c968a2?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8bWFuJTIwd2hpdGUlMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg2fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "man in white dress shirt and blue denim jeans",
+      "credit": {
+        "name": "Jeremy McGilvrey",
+        "profile": "https://unsplash.com/@jeremy_mcgilvrey?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-white-dress-shirt-and-blue-denim-jeans-20oegq2JDYU?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "Ll6ggwPpKIo",
+      "url": "https://images.unsplash.com/photo-1618001789159-ffffe6f96ef2?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NXx8bWFuJTIwd2hpdGUlMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg2fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#262626",
+      "alt": "A man in a white shirt and black trousers with suspenders outdoors",
+      "credit": {
+        "name": "Mohamad Khosravi",
+        "profile": "https://unsplash.com/@mohamadkhosravi?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-white-shirt-and-suspenders-Ll6ggwPpKIo?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "slim-fit-oxford-shirt/sky-blue": [
+    {
+      "id": "VUHOlNZEhPs",
+      "url": "https://images.unsplash.com/photo-1529284607059-de6f2f0e661f?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8Nnx8bWFuJTIwd2hpdGUlMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg2fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "a man in a white shirt is posing for a picture",
+      "credit": {
+        "name": "Steven Erixon",
+        "profile": "https://unsplash.com/@stevenerixon?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-in-a-white-shirt-is-posing-for-a-picture-VUHOlNZEhPs?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "linen-blend-casual-shirt/beige": [
+    {
+      "id": "S4f4apZd-hA",
+      "url": "https://images.unsplash.com/photo-1713881587420-113c1c43e28a?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8bWFuJTIwbGluZW4lMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg3fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9d9d9",
+      "alt": "a white shirt hanging on a clothes line",
+      "credit": {
+        "name": "tian dayong",
+        "profile": "https://unsplash.com/@tonnnyj?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-white-shirt-hanging-on-a-clothes-line-S4f4apZd-hA?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "D_Y-BuWJvjw",
+      "url": "https://images.unsplash.com/photo-1627686011747-74adda3d2343?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NHx8bWFuJTIwbGluZW4lMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg3fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "man in white dress shirt standing near green plants during daytime",
+      "credit": {
+        "name": "Ricardo Morales",
+        "profile": "https://unsplash.com/@ricardoaaron?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-white-dress-shirt-standing-near-green-plants-during-daytime-D_Y-BuWJvjw?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "linen-blend-casual-shirt/navy": [
+    {
+      "id": "8UsQoiJLNNQ",
+      "url": "https://images.unsplash.com/photo-1713881649391-a1c8ddaf83cd?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NXx8bWFuJTIwbGluZW4lMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg3fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9d9d9",
+      "alt": "a blue shirt hanging on a clothes line",
+      "credit": {
+        "name": "tian dayong",
+        "profile": "https://unsplash.com/@tonnnyj?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-blue-shirt-hanging-on-a-clothes-line-8UsQoiJLNNQ?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "linen-blend-casual-shirt/grey": [
+    {
+      "id": "maHb1ki_X3o",
+      "url": "https://images.unsplash.com/photo-1693443688057-85f57b872a3c?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8M3x8bWFuJTIwbGluZW4lMjBzaGlydHxlbnwxfDF8fHwxNzkxNjUwNjg3fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9d9c0",
+      "alt": "a t - shirt hanging on a clothes line",
+      "credit": {
+        "name": "tian dayong",
+        "profile": "https://unsplash.com/@tonnnyj?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-t-shirt-hanging-on-a-clothes-line-maHb1ki_X3o?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "cotton-straight-kurta/white": [
+    {
+      "id": "2FeZkURjGTk",
+      "url": "https://images.unsplash.com/photo-1785612824298-362f5a8dfe78?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTR8fG1hbiUyMHdoaXRlJTIwa3VydGF8ZW58MXwxfHx8MTc5MTY1MDY4Mnww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#c0c0c0",
+      "alt": "Man in cream kurta standing by red and white posts",
+      "credit": {
+        "name": "MOHAMMAD AL JANNAT RAKIN",
+        "profile": "https://unsplash.com/@aljannatrakin?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-cream-kurta-standing-by-red-and-white-posts-2FeZkURjGTk?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "MWPwmxqr8X8",
+      "url": "https://images.unsplash.com/photo-1781106785213-ee999c3edf50?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8bWFuJTIwd2hpdGUlMjBrdXJ0YXxlbnwxfDF8fHwxNzkxNjUwNjgyfDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#8c7373",
+      "alt": "A man in a cream kurta stands among trees",
+      "credit": {
+        "name": "MOHAMMAD AL JANNAT RAKIN",
+        "profile": "https://unsplash.com/@aljannatrakin?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-in-a-cream-kurta-stands-among-trees-MWPwmxqr8X8?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "cotton-straight-kurta/maroon": [
+    {
+      "id": "1tk59j6Urvs",
+      "url": "https://images.unsplash.com/photo-1628250521470-28c1fc54616c?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NXx8bWFuJTIwZmVzdGl2ZSUyMGt1cnRhfGVufDF8MXx8fDE3OTE2NTA2ODR8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#a6a673",
+      "alt": "man in red sweater and white pants standing on dirt road during daytime",
+      "credit": {
+        "name": "Shazaf Zafar",
+        "profile": "https://unsplash.com/@szpremium?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-red-sweater-and-white-pants-standing-on-dirt-road-during-daytime-1tk59j6Urvs?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "cotton-straight-kurta/mustard": [
+    {
+      "id": "KbYXDew9uNk",
+      "url": "https://images.unsplash.com/photo-1768807478320-fcfd3929acb2?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8OHx8bWFuJTIwZmVzdGl2ZSUyMGt1cnRhfGVufDF8MXx8fDE3OTE2NTA2ODR8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A man in a yellow kurta and white pants sits",
+      "credit": {
+        "name": "Noor Alam",
+        "profile": "https://unsplash.com/@itsmenoor2022?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-in-a-yellow-kurta-and-white-pants-sits-KbYXDew9uNk?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "festive-silk-blend-kurta/royal-blue": [
+    {
+      "id": "sLRFg-VC2FY",
+      "url": "https://images.unsplash.com/photo-1770359993283-a2c2f386584e?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8N3x8bWFuJTIwZmVzdGl2ZSUyMGt1cnRhfGVufDF8MXx8fDE3OTE2NTA2ODR8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#a68c73",
+      "alt": "A man in a blue kurta and pants smiles",
+      "credit": {
+        "name": "Noor Alam",
+        "profile": "https://unsplash.com/@itsmenoor2022?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-in-a-blue-kurta-and-pants-smiles-sLRFg-VC2FY?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "festive-silk-blend-kurta/pink": [
+    {
+      "id": "DatmJfAvtOQ",
+      "url": "https://images.unsplash.com/photo-1727835523550-18478cacefa2?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8M3x8bWFuJTIwZmVzdGl2ZSUyMGt1cnRhfGVufDF8MXx8fDE3OTE2NTA2ODR8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#595959",
+      "alt": "A man sitting on a table with a bowl of flowers",
+      "credit": {
+        "name": "Firangi Yarn Menswear Brand",
+        "profile": "https://unsplash.com/@firangiyarn?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-sitting-on-a-table-with-a-bowl-of-flowers-DatmJfAvtOQ?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "slim-fit-stretch-jeans/indigo": [
+    {
+      "id": "nC4-PXzKZcI",
+      "url": "https://images.unsplash.com/photo-1754555009601-498e9873197e?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8OXx8bWFuJTIwamVhbnN8ZW58MXwxfHx8MTc5MTY1MDY4OXww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "Jeans hang on a wooden hanger",
+      "credit": {
+        "name": "Pesce Huang",
+        "profile": "https://unsplash.com/@pesce?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/jeans-hang-on-a-wooden-hanger-nC4-PXzKZcI?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "17qC7l19hMI",
+      "url": "https://images.unsplash.com/photo-1555689502-c4b22d76c56f?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTB8fG1hbiUyMGplYW5zfGVufDF8MXx8fDE3OTE2NTA2ODl8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#262626",
+      "alt": "man in blue denim jeans standing",
+      "credit": {
+        "name": "Ivan Bogdanov",
+        "profile": "https://unsplash.com/@ivnbgdnv?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/man-in-blue-denim-jeans-standing-17qC7l19hMI?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "OnIVkXJYOMQ",
+      "url": "https://images.unsplash.com/photo-1662868395526-ab6ad55ee1ea?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTN8fG1hbiUyMGplYW5zfGVufDF8MXx8fDE3OTE2NTA2ODl8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#26260c",
+      "alt": "a person holding a gun",
+      "credit": {
+        "name": "Frederick Shaw",
+        "profile": "https://unsplash.com/@dropfastcollective?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-person-holding-a-gun-OnIVkXJYOMQ?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-a-line-rayon-kurta/pink": [
+    {
+      "id": "kN3tHdXDDrs",
+      "url": "https://images.unsplash.com/photo-1741847639057-b51a25d42892?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8Mnx8d29tYW4lMjBrdXJ0YXxlbnwxfDF8fHwxNzkxNjUwNjg1fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9c0c0",
+      "alt": "Woman poses in a pink floral kurta and pants",
+      "credit": {
+        "name": "Shahenaz India",
+        "profile": "https://unsplash.com/@shahenazindia?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-poses-in-a-pink-floral-kurta-and-pants-kN3tHdXDDrs?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-a-line-rayon-kurta/white": [
+    {
+      "id": "Yci8aYzkjpk",
+      "url": "https://images.unsplash.com/photo-1745313452052-0e4e341f326c?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8d29tYW4lMjBrdXJ0YXxlbnwxfDF8fHwxNzkxNjUwNjg1fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9c0c0",
+      "alt": "Woman models a white floral kurta pajama",
+      "credit": {
+        "name": "Shahenaz India",
+        "profile": "https://unsplash.com/@shahenazindia?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-models-a-white-floral-kurta-pajama-Yci8aYzkjpk?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "S6F1Zwty2Ok",
+      "url": "https://images.unsplash.com/photo-1731577506253-0fd9cd00ab7f?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTB8fHdvbWFuJTIwa3VydGF8ZW58MXwxfHx8MTc5MTY1MDY4NXww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#d9d9c0",
+      "alt": "A woman standing in front of a white wall",
+      "credit": {
+        "name": "Naseebo",
+        "profile": "https://unsplash.com/@naseebo?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-woman-standing-in-front-of-a-white-wall-S6F1Zwty2Ok?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "flowy-maxi-dress/red": [
+    {
+      "id": "o8zUQZfCYpE",
+      "url": "https://images.unsplash.com/photo-1606480192262-e3b6a9f37142?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTB8fHdvbWFuJTIwcmVkJTIwZHJlc3N8ZW58MXwxfHx8MTc5MTY1MDY5MHww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#c0c0c0",
+      "alt": "woman in red tube dress",
+      "credit": {
+        "name": "Laura Chouette",
+        "profile": "https://unsplash.com/@laurachouette?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-in-red-tube-dress-o8zUQZfCYpE?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "8Aq_zfMHPbU",
+      "url": "https://images.unsplash.com/photo-1508742345712-0656a285ac27?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8Nnx8d29tYW4lMjByZWQlMjBkcmVzc3xlbnwxfDF8fHwxNzkxNjUwNjkwfDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3d9c0",
+      "alt": "woman walking on street",
+      "credit": {
+        "name": "Tamara Bellis",
+        "profile": "https://unsplash.com/@tamarabellis?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-walking-on-street-8Aq_zfMHPbU?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-everyday-cotton-t-shirt/white": [
+    {
+      "id": "3ZVlU7xF0PM",
+      "url": "https://images.unsplash.com/photo-1663573688915-c45fb3b45bba?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8M3x8d29tYW4lMjB3aGl0ZSUyMHQtc2hpcnR8ZW58MXwxfHx8MTc5MTY1MDY5Mnww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#a6a6a6",
+      "alt": "a woman posing for a picture",
+      "credit": {
+        "name": "Mediamodifier",
+        "profile": "https://unsplash.com/@mediamodifier?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-woman-posing-for-a-picture-3ZVlU7xF0PM?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "EAI-gFIGiYQ",
+      "url": "https://images.unsplash.com/photo-1705515450707-c1f4e67b613e?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTR8fHdvbWFuJTIwd2hpdGUlMjB0LXNoaXJ0fGVufDF8MXx8fDE3OTE2NTA2OTJ8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#595940",
+      "alt": "a woman sitting on a log in the woods",
+      "credit": {
+        "name": "Ionela Mat",
+        "profile": "https://unsplash.com/@ionelaaaaa?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-woman-sitting-on-a-log-in-the-woods-EAI-gFIGiYQ?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "unisex-fleece-hoodie/grey": [
+    {
+      "id": "VoP2WK9rTa4",
+      "url": "https://images.unsplash.com/photo-1688111421205-a0a85415b224?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NXx8Z3JleSUyMGhvb2RpZXxlbnwxfDF8fHwxNzkxNjUwNjkzfDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#c0c0c0",
+      "alt": "a man with a beard wearing a white hoodie",
+      "credit": {
+        "name": "Abraham Flores",
+        "profile": "https://unsplash.com/@abrahamf?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-with-a-beard-wearing-a-white-hoodie-VoP2WK9rTa4?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "Cglj4LP4GTQ",
+      "url": "https://images.unsplash.com/photo-1663573688938-2b3e7ea2ab33?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8N3x8Z3JleSUyMGhvb2RpZXxlbnwxfDF8fHwxNzkxNjUwNjkzfDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#404040",
+      "alt": "a woman posing for a picture",
+      "credit": {
+        "name": "Mediamodifier",
+        "profile": "https://unsplash.com/@mediamodifier?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-woman-posing-for-a-picture-Cglj4LP4GTQ?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-cotton-joggers/grey": [
+    {
+      "id": "q7HfJHayc18",
+      "url": "https://images.unsplash.com/photo-1789110854262-ec66f0648ec7?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8OXx8d29tYW4lMjBqb2dnZXJzfGVufDF8MXx8fDE3OTE2NTA2OTV8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A person wearing a black crop top and grey sweatpants with white sneakers",
+      "credit": {
+        "name": "engin akyurt",
+        "profile": "https://unsplash.com/@enginakyurt?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/person-in-sweatpants-and-crop-top-q7HfJHayc18?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    },
+    {
+      "id": "y2WnRJssfZw",
+      "url": "https://images.unsplash.com/photo-1789110519766-117eb0e35bea?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTR8fHdvbWFuJTIwam9nZ2Vyc3xlbnwxfDF8fHwxNzkxNjUwNjk1fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A woman with long curly hair in a black tank top and grey sweatpants",
+      "credit": {
+        "name": "engin akyurt",
+        "profile": "https://unsplash.com/@enginakyurt?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-in-black-tank-and-sweatpants-y2WnRJssfZw?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-cotton-joggers/red": [
+    {
+      "id": "zwTOVBDiKMI",
+      "url": "https://images.unsplash.com/photo-1789110853355-e40f5735b0c0?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8N3x8d29tYW4lMjBqb2dnZXJzfGVufDF8MXx8fDE3OTE2NTA2OTV8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A woman in a white tank top and red sweatpants with white sneakers",
+      "credit": {
+        "name": "engin akyurt",
+        "profile": "https://unsplash.com/@enginakyurt?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-in-red-sweatpants-and-top-zwTOVBDiKMI?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "womens-cotton-joggers/teal": [
+    {
+      "id": "ww_22I-QpJ0",
+      "url": "https://images.unsplash.com/photo-1789110854286-93abcccf6e68?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTJ8fHdvbWFuJTIwam9nZ2Vyc3xlbnwxfDF8fHwxNzkxNjUwNjk1fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "A person wearing bright blue sweatpants with a white drawstring and white sneakers",
+      "credit": {
+        "name": "engin akyurt",
+        "profile": "https://unsplash.com/@enginakyurt?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/blue-sweatpants-with-white-sneakers-ww_22I-QpJ0?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "kids-cotton-t-shirt/royal-blue": [
+    {
+      "id": "DDHZMhGu5lU",
+      "url": "https://images.unsplash.com/photo-1754639488181-7eae9f6c06e0?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8Nnx8a2lkcyUyMHQtc2hpcnR8ZW58MXwxfHx8MTc5MTY1MDY5Nnww&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#26260c",
+      "alt": "Young child with curly blonde hair in blue shirt",
+      "credit": {
+        "name": "Sina Malek",
+        "profile": "https://unsplash.com/@sinamalek?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/young-child-with-curly-blonde-hair-in-blue-shirt-DDHZMhGu5lU?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "kids-cotton-t-shirt/lavender": [
+    {
+      "id": "PYcs21cIDUA",
+      "url": "https://images.unsplash.com/photo-1761204474559-8f1d1a7e9104?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MTV8fGtpZHMlMjB0LXNoaXJ0fGVufDF8MXx8fDE3OTE2NTA2OTZ8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#c0a6c0",
+      "alt": "A young boy with dark hair wearing a purple t-shirt",
+      "credit": {
+        "name": "Pradeep Kumar pr",
+        "profile": "https://unsplash.com/@dharshpradeep?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-young-boy-with-dark-hair-wearing-a-purple-t-shirt-PYcs21cIDUA?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "banner/women": [
+    {
+      "id": "B8IidBHe2M0",
+      "url": "https://images.unsplash.com/photo-1612595391900-29390866733a?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8N3x8aW5kaWFuJTIwZmFzaGlvbiUyMG1vZGVsfGVufDF8MXx8fDE3OTE2NTA2OTh8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#f3f3f3",
+      "alt": "woman in red and white dress holding wheat",
+      "credit": {
+        "name": "Kuppism",
+        "profile": "https://unsplash.com/@kuppism?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/woman-in-red-and-white-dress-holding-wheat-B8IidBHe2M0?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "banner/men": [
+    {
+      "id": "hEuVOYuq1l4",
+      "url": "https://images.unsplash.com/photo-1727835523545-70ee992b5763?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8MXx8bWFuJTIwZmVzdGl2ZSUyMGt1cnRhfGVufDF8MXx8fDE3OTE2NTA2ODR8MA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#c0d9c0",
+      "alt": "A man standing next to a tree wearing a green shirt",
+      "credit": {
+        "name": "Firangi Yarn Menswear Brand",
+        "profile": "https://unsplash.com/@firangiyarn?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-man-standing-next-to-a-tree-wearing-a-green-shirt-hEuVOYuq1l4?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ],
+  "banner/festive": [
+    {
+      "id": "2oQy4GAGxbk",
+      "url": "https://images.unsplash.com/photo-1735052712489-f45220126a0c?ixid=M3wxMDk4MzYwfDB8MXxzZWFyY2h8NXx8aW5kaWFuJTIwd2VkZGluZyUyMG91dGZpdHxlbnwxfDF8fHwxNzkxNjUwNjk5fDA&ixlib=rb-4.1.0&auto=format&fit=crop&crop=faces,entropy&w=1200&h=1500&q=80",
+      "color": "#737373",
+      "alt": "A bride and groom walking down a path",
+      "credit": {
+        "name": "iKshana Productions",
+        "profile": "https://unsplash.com/@ikshanaproductions?utm_source=clothing_store_demo&utm_medium=referral",
+        "photo": "https://unsplash.com/photos/a-bride-and-groom-walking-down-a-path-2oQy4GAGxbk?utm_source=clothing_store_demo&utm_medium=referral"
+      }
+    }
+  ]
+}

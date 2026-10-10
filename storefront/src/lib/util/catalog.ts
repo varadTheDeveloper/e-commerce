@@ -99,20 +99,38 @@ export function productFabric(product: HttpTypes.StoreProduct): string | undefin
 }
 
 /**
- * Images for one colour. Demo and admin-uploaded images follow the naming
- * "<anything>-<colour>.webp" / "<anything>-<colour>-detail.webp"; if none
- * match, all product images are returned.
+ * Images for one colour, in this order of preference:
+ * 1. images tagged with that colour (image metadata "colour", set by the seed),
+ * 2. images the admin attached to that colour's variants,
+ * 3. file names ending "-<colour>.<ext>" / "-<colour>-<n>.<ext>",
+ * 4. otherwise every product image.
  */
 export function imagesForColour(
   product: HttpTypes.StoreProduct,
   colour?: string
 ): string[] {
-  const all = (product.images ?? []).map((i) => i.url).filter(Boolean)
-  if (!colour) return all.length ? all : product.thumbnail ? [product.thumbnail] : []
-  const matching = all.filter((url) =>
-    new RegExp(`-${colour}(-[a-z0-9]+)?\\.[a-z]+$`, "i").test(url)
-  )
-  return matching.length ? matching : all
+  const images = product.images ?? []
+  const all = images.map((i) => i.url).filter(Boolean)
+  if (!all.length) return product.thumbnail ? [product.thumbnail] : []
+  if (!colour) return all
+
+  const tagged = images.filter((i) => i.metadata?.colour === colour).map((i) => i.url)
+  if (tagged.length) return tagged
+
+  const variantUrls = (product.variants ?? [])
+    .filter((v) => variantOption(product, v, COLOUR_OPTION) === colour)
+    .flatMap((v) => v.images ?? [])
+    .map((i) => i.url)
+  if (variantUrls.length) return [...new Set(variantUrls)]
+
+  const named = all.filter((url) => new RegExp(`-${colour}(-[a-z0-9]+)?\\.[a-z]+$`, "i").test(url))
+  return named.length ? named : all
+}
+
+/** Alt text saved with a picture, if any. */
+export function imageAlt(product: HttpTypes.StoreProduct, url: string): string | undefined {
+  const alt = product.images?.find((i) => i.url === url)?.metadata?.alt
+  return typeof alt === "string" ? alt : undefined
 }
 
 // ----- Filters -----

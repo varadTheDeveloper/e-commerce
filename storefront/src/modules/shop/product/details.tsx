@@ -5,9 +5,9 @@ import { ChevronDownIcon } from "@modules/common/icons/ui"
 function Section({ title, open, children }: { title: string; open?: boolean; children: React.ReactNode }) {
   return (
     <details open={open} className="group border-b border-line">
-      <summary className="flex cursor-pointer list-none items-center justify-between py-4 font-semibold [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[15px] [&::-webkit-details-marker]:hidden">
         {title}
-        <ChevronDownIcon size={20} className="transition-transform group-open:rotate-180" />
+        <ChevronDownIcon size={18} strokeWidth={1.5} className="transition-transform group-open:rotate-180" />
       </summary>
       <div className="pb-4 text-sm leading-relaxed text-muted">{children}</div>
     </details>

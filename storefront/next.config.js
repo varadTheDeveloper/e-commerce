@@ -31,6 +31,11 @@ const nextConfig = {
         hostname: "localhost",
       },
       {
+        // Demo photos (Unsplash, free licence); remove once the brand's photos are in
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
         protocol: "https",
         hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
       },

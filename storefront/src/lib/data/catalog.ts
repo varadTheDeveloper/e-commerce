@@ -28,6 +28,7 @@ const PRODUCT_FIELDS = [
   "+variants.inventory_quantity",
   "+variants.manage_inventory",
   "+variants.allow_backorder",
+  "*variants.images",
 ].join(",")
 
 /** Shop catalogue is small (hundreds of products), so pages load it whole and filter in memory. */

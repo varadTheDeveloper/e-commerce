@@ -6,12 +6,9 @@ export default function Logo() {
   return (
     <LocalizedClientLink
       href="/"
-      className="flex items-center gap-1.5 text-[22px] font-bold leading-none tracking-tight text-brand-700"
+      className="font-heading text-[26px] uppercase leading-none tracking-[0.22em] text-ink small:text-[30px]"
       data-testid="nav-store-link"
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-600 text-base text-white">
-        {BRAND.name.charAt(0)}
-      </span>
       {BRAND.name}
     </LocalizedClientLink>
   )

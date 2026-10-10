@@ -29,18 +29,18 @@ export default function SizeChartButton({ chartKey }: { chartKey?: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700"
+        className="flex items-center gap-1.5 text-sm underline underline-offset-4 hover:opacity-70"
         data-testid="size-chart-button"
       >
-        <RulerIcon size={18} />
+        <RulerIcon size={18} strokeWidth={1.5} />
         {t.product.sizeChart}
       </button>
       {open && (
         <div className="fixed inset-0 z-[110] flex items-end justify-center small:items-center" role="dialog" aria-modal="true" aria-labelledby="size-chart-title">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="relative max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 small:max-w-lg small:rounded-2xl">
+          <div className="relative max-h-[85vh] w-full overflow-y-auto bg-white p-6 small:max-w-lg">
             <div className="mb-3 flex items-center justify-between">
-              <h2 id="size-chart-title" className="text-lg font-semibold">
+              <h2 id="size-chart-title" className="font-heading text-xl">
                 {t.sizeChart.title}
               </h2>
               <button type="button" onClick={() => setOpen(false)} className="flex h-10 w-10 items-center justify-center" aria-label={t.common.close}>
@@ -51,7 +51,7 @@ export default function SizeChartButton({ chartKey }: { chartKey?: string }) {
             <table className="w-full text-center text-sm" data-testid="size-chart-table">
               <thead>
                 <tr className="bg-surface">
-                  <th className="px-2 py-2.5 font-semibold">{isKids ? t.sizeChart.age : t.sizeChart.size}</th>
+                  <th className="px-2 py-2.5 font-medium">{isKids ? t.sizeChart.age : t.sizeChart.size}</th>
                   {chart.columns.map((c) => (
                     <th key={c} className="px-2 py-2.5 font-semibold">
                       {t.sizeChart[c]}
@@ -62,7 +62,7 @@ export default function SizeChartButton({ chartKey }: { chartKey?: string }) {
               <tbody>
                 {chart.rows.map((row) => (
                   <tr key={row.size} className="border-b border-line">
-                    <td className="px-2 py-2.5 font-semibold">{row.size}</td>
+                    <td className="px-2 py-2.5 font-medium">{row.size}</td>
                     {row.values.map((v, i) => (
                       <td key={i} className="px-2 py-2.5">
                         {v}
@@ -72,8 +72,8 @@ export default function SizeChartButton({ chartKey }: { chartKey?: string }) {
                 ))}
               </tbody>
             </table>
-            <div className="mt-4 rounded-lg bg-surface p-4 text-sm">
-              <p className="mb-1.5 font-semibold">{t.sizeChart.howToMeasure}</p>
+            <div className="mt-4 bg-surface p-4 text-sm">
+              <p className="mb-1.5 font-medium">{t.sizeChart.howToMeasure}</p>
               <ul className="list-disc space-y-1 pl-5 text-muted">
                 <li>{t.sizeChart.tipChest}</li>
                 <li>{t.sizeChart.tipWaist}</li>

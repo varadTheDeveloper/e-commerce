@@ -21,22 +21,27 @@ export default function Footer({
   const legal = [{ label: t.footer.privacy }, { label: t.footer.terms }, { label: t.footer.grievance }]
 
   return (
-    <footer className="mt-16 border-t border-line bg-surface pb-20 small:pb-0">
-      <div className="content-container grid grid-cols-2 gap-8 py-12 small:grid-cols-4">
+    <footer className="mt-20 bg-ink pb-20 text-white small:pb-0">
+      <div className="content-container grid grid-cols-2 gap-10 py-14 small:grid-cols-4">
         <div className="col-span-2 small:col-span-1">
-          <p className="text-xl font-bold text-brand-700">{BRAND.name}</p>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted">{t.footer.about}</p>
+          <p className="font-heading text-2xl uppercase tracking-[0.22em]">{BRAND.name}</p>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/70">{t.footer.about}</p>
         </div>
         <FooterList title={t.footer.shop} links={categories.map((c) => ({ href: `/categories/${c.handle}`, label: c.name }))} />
         <FooterList title={t.footer.help} links={help} />
         <FooterList title={t.footer.legal} links={legal} />
       </div>
-      <div className="border-t border-line">
-        <div className="content-container flex flex-col gap-2 py-5 text-xs text-muted small:flex-row small:justify-between">
+      <div className="border-t border-white/15">
+        <div className="content-container flex flex-col gap-2 py-5 text-xs text-white/60 small:flex-row small:justify-between">
           <p>{format(t.footer.rights, { year: new Date().getFullYear(), brand: BRAND.name })}</p>
-          <a href={BRAND.sourceCodeUrl} className="hover:text-ink" rel="noopener">
-            {t.footer.sourceCode}
-          </a>
+          <span className="flex gap-5">
+            <LocalizedClientLink href="/credits" className="hover:text-white">
+              {t.credits.title}
+            </LocalizedClientLink>
+            <a href={BRAND.sourceCodeUrl} className="hover:text-white" rel="noopener">
+              {t.footer.sourceCode}
+            </a>
+          </span>
         </div>
       </div>
     </footer>
@@ -46,12 +51,12 @@ export default function Footer({
 function FooterList({ title, links }: { title: string; links: { href?: string; label: string }[] }) {
   return (
     <div>
-      <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink">{title}</p>
-      <ul className="space-y-2.5 text-sm text-muted">
+      <p className="eyebrow mb-4 text-white/50">{title}</p>
+      <ul className="space-y-2.5 text-sm text-white/80">
         {links.map((l) => (
           <li key={l.label}>
             {l.href ? (
-              <LocalizedClientLink href={l.href} className="hover:text-brand-700">
+              <LocalizedClientLink href={l.href} className="hover:text-white">
                 {l.label}
               </LocalizedClientLink>
             ) : (

@@ -21,28 +21,30 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
-        // Brand colours (placeholder until the client sends theirs)
+        // Brand colours (placeholder until the client sends theirs):
+        // warm off-white, near-black, and one deep maroon accent.
         brand: {
-          50: "#eef0fb",
-          100: "#dce0f6",
-          200: "#b9c1ec",
-          500: "#3d4bb8",
-          600: "#2f3c9e",
-          700: "#252f80",
-          900: "#151a45",
+          50: "#f8eeee",
+          100: "#f0dcdc",
+          200: "#dcb3b5",
+          500: "#8f2a36",
+          600: "#7a1f2b",
+          700: "#621823",
+          900: "#3b0e15",
         },
         accent: {
-          100: "#fdf0d5",
-          400: "#f7b538",
-          500: "#f29f05",
-          600: "#d48700",
+          100: "#f4ede1",
+          400: "#c9a96e",
+          500: "#b08d57",
+          600: "#8f6f3e",
         },
-        ink: "#16182b",
-        muted: "#5d6170",
-        line: "#e4e6ec",
-        surface: "#f4f5f8",
-        saving: "#087434",
-        danger: "#c8352b",
+        ink: "#1c1b19",
+        muted: "#6b665f",
+        line: "#e7e2da",
+        surface: "#f4f1ec",
+        cream: "#fbf9f6",
+        saving: "#9b2331",
+        danger: "#b3261e",
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -81,6 +83,7 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
+        heading: ["var(--font-heading)", "Georgia", "serif"],
         sans: [
           "var(--font-sans)",
           "Inter",

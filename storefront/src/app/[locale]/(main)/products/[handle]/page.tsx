@@ -52,18 +52,18 @@ export default async function ProductPage(props: Props) {
 
   return (
     <div className="pb-24 small:pb-0">
-      <div className="content-container py-3 small:py-6">
-        <nav aria-label="Breadcrumb" className="mb-3 text-[13px] text-muted">
+      <div className="content-container pb-6 pt-0 small:py-6">
+        <nav aria-label="Breadcrumb" className="hidden pb-4 text-[13px] text-muted small:block">
           <ol className="flex flex-wrap items-center gap-1">
             <li>
-              <LocalizedClientLink href="/" className="hover:text-brand-700">
+              <LocalizedClientLink href="/" className="hover:text-ink">
                 {t.common.home}
               </LocalizedClientLink>
             </li>
             {category && (
               <li className="flex items-center gap-1">
                 <ChevronRightIcon size={14} />
-                <LocalizedClientLink href={`/categories/${category.handle}`} className="hover:text-brand-700">
+                <LocalizedClientLink href={`/categories/${category.handle}`} className="hover:text-ink">
                   {category.name}
                 </LocalizedClientLink>
               </li>

@@ -151,6 +151,27 @@ const en = {
     retry: "Try again",
     transferring: "Moving…",
   },
+  wishlist: {
+    title: "Wishlist",
+    add: "Save to wishlist",
+    remove: "Remove from wishlist",
+    empty: "Your wishlist is empty. Tap the heart on any product to save it here.",
+    note: "Saved on this device. It will move to your account once you log in.",
+  },
+  credits: {
+    title: "Photo credits",
+    intro: "The pictures on this demo shop are free photos from Unsplash. Thank you to these photographers.",
+    by: "Photo by {name} on Unsplash",
+  },
+  home2: {
+    women: "Women",
+    men: "Men",
+    shopWomen: "Shop women",
+    shopMen: "Shop men",
+    newIn: "New in",
+    bestseller: "Bestseller",
+    newBadge: "New",
+  },
   notFound: {
     title: "Page not found",
     text: "The page you are looking for does not exist.",

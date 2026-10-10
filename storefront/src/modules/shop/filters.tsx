@@ -71,24 +71,24 @@ export default function ListingFilters({
   return (
     <>
       {/* Phones: sticky Sort / Filter bar with bottom sheets */}
-      <div className="sticky top-[7.75rem] z-30 -mx-4 mb-4 grid grid-cols-2 border-y border-line bg-white small:hidden">
-        <button type="button" onClick={() => setSheet("sort")} className="flex h-12 items-center justify-center gap-2 border-r border-line text-sm font-semibold">
+      <div className="sticky top-14 z-30 -mx-4 mb-4 grid grid-cols-2 border-y border-line bg-white small:hidden">
+        <button type="button" onClick={() => setSheet("sort")} className="flex h-12 items-center justify-center gap-2 border-r border-line text-sm">
           <SortIcon size={18} />
           {t.listing.sortBy}
         </button>
-        <button type="button" onClick={() => setSheet("filters")} className="flex h-12 items-center justify-center gap-2 text-sm font-semibold" data-testid="open-filters">
+        <button type="button" onClick={() => setSheet("filters")} className="flex h-12 items-center justify-center gap-2 text-sm" data-testid="open-filters">
           <FilterIcon size={18} />
           {t.listing.filters}
-          {count > 0 && <span className="rounded-full bg-brand-600 px-2 text-xs text-white">{count}</span>}
+          {count > 0 && <span className="rounded-full bg-ink px-2 text-xs text-white">{count}</span>}
         </button>
       </div>
 
       {sheet && (
         <div className="fixed inset-0 z-[100] small:hidden" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSheet(null)} />
-          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-white">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col bg-white">
             <div className="flex h-14 items-center justify-between border-b border-line px-4">
-              <span className="font-semibold">{sheet === "sort" ? t.listing.sortBy : t.listing.filters}</span>
+              <span className="font-heading text-lg">{sheet === "sort" ? t.listing.sortBy : t.listing.filters}</span>
               <button type="button" onClick={() => setSheet(null)} className="flex h-10 w-10 items-center justify-center" aria-label={t.common.close}>
                 <CloseIcon />
               </button>
@@ -107,7 +107,7 @@ export default function ListingFilters({
                         className="flex w-full items-center justify-between py-3.5 text-left"
                       >
                         {sortLabels[key]}
-                        {key === sort && <CheckIcon size={18} className="text-brand-600" />}
+                        {key === sort && <CheckIcon size={18} />}
                       </button>
                     </li>
                   ))}
@@ -133,9 +133,9 @@ export default function ListingFilters({
       {/* Computers: sidebar */}
       <aside className="hidden small:block" aria-label={t.listing.filters}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">{t.listing.filters}</h2>
+          <h2 className="eyebrow">{t.listing.filters}</h2>
           {count > 0 && (
-            <button type="button" onClick={clear} className="text-sm font-semibold text-brand-600">
+            <button type="button" onClick={clear} className="text-sm underline">
               {t.listing.clearFilters}
             </button>
           )}
@@ -171,7 +171,7 @@ export function SortSelect({
       <select
         value={sort}
         onChange={(e) => router.push(`${pathname}${filtersToQuery(filters, e.target.value as SortKey, keep)}`, { scroll: false })}
-        className="h-10 rounded-lg border border-line bg-white px-3 font-medium"
+        className="h-10 border border-line bg-white px-3"
         data-testid="sort-select"
       >
         {SORT_KEYS.map((key) => (
@@ -208,7 +208,7 @@ function FilterGroups({
     <div className="divide-y divide-line">
       {facets.size.length > 0 && (
         <div role="group" aria-label={t.listing.filter.size} className="py-4">
-          <p className="mb-3 font-semibold">{t.listing.filter.size}</p>
+          <p className="mb-3 text-sm font-medium">{t.listing.filter.size}</p>
           <div className="flex flex-wrap gap-2">
             {facets.size.map(({ value }) => {
               const on = filters.size.includes(value)
@@ -218,7 +218,7 @@ function FilterGroups({
                   type="button"
                   aria-pressed={on}
                   onClick={() => onToggle("size", value)}
-                  className={`chip h-9 min-w-[2.75rem] px-3 ${on ? "chip-active" : ""}`}
+                  className={`chip h-9 min-w-[2.75rem] px-3 text-[13px] ${on ? "chip-active" : ""}`}
                   data-testid={`filter-size-${value}`}
                 >
                   {value}
@@ -230,7 +230,7 @@ function FilterGroups({
       )}
       {facets.colour.length > 0 && (
         <div role="group" aria-label={t.listing.filter.colour} className="py-4">
-          <p className="mb-3 font-semibold">{t.listing.filter.colour}</p>
+          <p className="mb-3 text-sm font-medium">{t.listing.filter.colour}</p>
           <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
             {facets.colour.map(({ value, count }) => (
               <Check key={value} checked={filters.colour.includes(value)} onChange={() => onToggle("colour", value)} testId={`filter-colour-${value}`}>
@@ -244,7 +244,7 @@ function FilterGroups({
       )}
       {facets.price.length > 0 && (
         <div role="group" aria-label={t.listing.filter.price} className="py-4">
-          <p className="mb-3 font-semibold">{t.listing.filter.price}</p>
+          <p className="mb-3 text-sm font-medium">{t.listing.filter.price}</p>
           <div className="flex flex-col gap-2.5">
             {facets.price.map(({ value, count }) => (
               <Check key={value} checked={filters.price.includes(value)} onChange={() => onToggle("price", value)} testId={`filter-price-${value}`}>
@@ -256,7 +256,7 @@ function FilterGroups({
       )}
       {facets.fabric.length > 0 && (
         <div role="group" aria-label={t.listing.filter.fabric} className="py-4">
-          <p className="mb-3 font-semibold">{t.listing.filter.fabric}</p>
+          <p className="mb-3 text-sm font-medium">{t.listing.filter.fabric}</p>
           <div className="flex flex-col gap-2.5">
             {facets.fabric.map(({ value, count }) => (
               <Check key={value} checked={filters.fabric.includes(value)} onChange={() => onToggle("fabric", value)} testId={`filter-fabric-${value}`}>
@@ -283,7 +283,7 @@ function Check({
 }) {
   return (
     <label className="flex cursor-pointer items-center gap-2 text-sm">
-      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-brand-600" data-testid={testId} />
+      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-ink" data-testid={testId} />
       {children}
     </label>
   )

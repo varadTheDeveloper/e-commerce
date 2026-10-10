@@ -1,9 +1,11 @@
+import { BANNERS } from "@config/banners"
 import { BRAND } from "@config/brand"
 import { listCategoryTree, listProductsFor } from "@lib/data/catalog"
 import { getDictionary } from "@lib/i18n"
 import { toLocale } from "@lib/i18n/config"
 import { imagesForColour, inCollection, productColours } from "@lib/util/catalog"
 import CategoryTiles from "@modules/home/components/category-tiles"
+import FestiveBand from "@modules/home/components/festive-band"
 import Hero from "@modules/home/components/hero"
 import TrustStrip from "@modules/home/components/trust-strip"
 import ProductRail from "@modules/shop/product-rail"
@@ -17,12 +19,7 @@ export async function generateMetadata(props: {
   return { title: { absolute: `${BRAND.name} | ${t.home.heroTitle}` }, description: t.footer.about }
 }
 
-/** First picture, preferring a colourful variant over white for banners and tiles. */
-const firstImage = (p?: HttpTypes.StoreProduct) => {
-  if (!p) return undefined
-  const colours = productColours(p)
-  return imagesForColour(p, colours.find((c) => c !== "white") ?? colours[0])[0]
-}
+const firstImage = (p?: HttpTypes.StoreProduct) => (p ? imagesForColour(p, productColours(p)[0])[0] : undefined)
 
 export default async function Home(props: { params: Promise<{ locale: string }> }) {
   const locale = toLocale((await props.params).locale)
@@ -49,14 +46,11 @@ export default async function Home(props: { params: Promise<{ locale: string }> 
 
   return (
     <>
-      <Hero
-        t={t}
-        heroImages={newArrivals.slice(0, 2).map(firstImage).filter((x): x is string => !!x)}
-        festiveImages={festive.slice(0, 2).map(firstImage).filter((x): x is string => !!x)}
-      />
+      <Hero t={t} women={BANNERS.women} men={BANNERS.men} />
       <TrustStrip t={t} />
-      <CategoryTiles title={t.home.shopByCategory} tiles={tiles} />
       <ProductRail priority title={t.home.newArrivals} href="/collections/new-arrivals" products={newArrivals} locale={locale} t={t} />
+      <CategoryTiles title={t.home.shopByCategory} tiles={tiles} />
+      <FestiveBand t={t} banner={BANNERS.festive} />
       <ProductRail title={t.home.festivePicks} href="/collections/festive" products={festive} locale={locale} t={t} />
     </>
   )

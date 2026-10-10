@@ -1,82 +1,60 @@
+import { Banner } from "@config/banners"
 import { Dictionary } from "@lib/i18n"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 
-type Banner = {
-  title: string
-  subtitle: string
-  cta: string
-  href: string
-  images: string[]
-  tone: "brand" | "festive"
-}
-
-const TONES = {
-  brand: "from-brand-700 via-brand-600 to-brand-500 text-white",
-  festive: "from-[#5b1220] via-[#7a1b2c] to-[#a3412a] text-white",
-}
-
-function BannerCard({ banner, priority }: { banner: Banner; priority?: boolean }) {
+/**
+ * Phones: one full-width photo with the headline and two buttons.
+ * Computers: women and men side by side, each with its own button.
+ */
+export default function Hero({ t, women, men }: { t: Dictionary; women: Banner; men: Banner }) {
   return (
-    <LocalizedClientLink
-      href={banner.href}
-      className={`group relative flex min-h-[220px] overflow-hidden rounded-2xl bg-gradient-to-br small:min-h-[340px] ${TONES[banner.tone]}`}
-    >
-      <div className="relative z-10 flex max-w-[60%] flex-col justify-center gap-3 p-6 small:p-10">
-        <h2 className="text-2xl font-bold leading-tight small:text-4xl">{banner.title}</h2>
-        <p className="text-sm opacity-90 small:text-lg">{banner.subtitle}</p>
-        <span className="mt-2 inline-flex h-11 w-fit items-center rounded-lg bg-accent-500 px-5 font-semibold text-ink transition-colors group-hover:bg-accent-400">
-          {banner.cta}
-        </span>
-      </div>
-      <div className="absolute inset-y-0 right-0 flex w-[48%] items-end justify-end gap-2 pr-3 small:pr-8">
-        {banner.images.slice(0, 2).map((src, i) => (
-          <div
-            key={src}
-            className={`relative aspect-[4/5] overflow-hidden rounded-xl shadow-2xl ring-4 ring-white/20 ${
-              i === 0 ? "mb-6 w-[62%] small:w-[46%]" : "mb-14 hidden w-[42%] small:block"
-            }`}
+    <section className="relative" data-testid="hero">
+      <div className="grid small:grid-cols-2">
+        {[
+          { banner: women, label: t.home2.women, cta: t.home2.shopWomen, href: "/categories/women" },
+          { banner: men, label: t.home2.men, cta: t.home2.shopMen, href: "/categories/men" },
+        ].map(({ banner, label, cta, href }, i) => (
+          <LocalizedClientLink
+            key={href}
+            href={href}
+            className={`group relative block aspect-[4/5] overflow-hidden bg-surface small:aspect-auto small:h-[min(86vh,820px)] ${i === 1 ? "hidden small:block" : ""}`}
           >
-            <Image src={src} alt="" fill priority={priority} sizes="(max-width: 640px) 30vw, 20vw" className="object-cover" />
-          </div>
+            <Image
+              src={banner.url}
+              alt={banner.alt ?? ""}
+              fill
+              priority={i === 0}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-[1.2s] group-hover:scale-[1.02]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 hidden flex-col items-center gap-4 p-10 text-center text-white small:flex">
+              <span className="font-heading text-5xl">{label}</span>
+              <span className="border-b border-white pb-1 text-sm tracking-wide">{cta}</span>
+            </div>
+          </LocalizedClientLink>
         ))}
       </div>
-    </LocalizedClientLink>
-  )
-}
 
-export default function Hero({
-  t,
-  heroImages,
-  festiveImages,
-}: {
-  t: Dictionary
-  heroImages: string[]
-  festiveImages: string[]
-}) {
-  return (
-    <section className="content-container grid gap-4 pt-4 small:grid-cols-[3fr_2fr] small:pt-6">
-      <BannerCard
-        priority
-        banner={{
-          title: t.home.heroTitle,
-          subtitle: t.home.heroSubtitle,
-          cta: t.home.heroCta,
-          href: "/store",
-          images: heroImages,
-          tone: "brand",
-        }}
-      />
-      <BannerCard
-        banner={{
-          title: t.home.festiveTitle,
-          subtitle: t.home.festiveSubtitle,
-          cta: t.home.festiveCta,
-          href: "/collections/festive",
-          images: festiveImages,
-          tone: "festive",
-        }}
-      />
+      {/* Phones: headline and buttons over the single photo */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 p-6 pb-8 text-center text-white small:hidden">
+        <h1 className="heading-xl">{t.home.heroTitle}</h1>
+        <p className="max-w-xs text-sm text-white/85">{t.home.heroSubtitle}</p>
+        <div className="pointer-events-auto mt-1 grid w-full max-w-xs grid-cols-2 gap-2">
+          <LocalizedClientLink href="/categories/women" className="inline-flex h-11 items-center justify-center bg-white text-sm font-medium text-ink">
+            {t.home2.women}
+          </LocalizedClientLink>
+          <LocalizedClientLink href="/categories/men" className="inline-flex h-11 items-center justify-center border border-white text-sm font-medium text-white">
+            {t.home2.men}
+          </LocalizedClientLink>
+        </div>
+      </div>
+      {/* Only one of the two headlines is shown (and read out) at a time */}
+      <div className="content-container hidden py-12 text-center small:block">
+        <h1 className="heading-xl">{t.home.heroTitle}</h1>
+        <p className="mt-3 text-muted">{t.home.heroSubtitle}</p>
+      </div>
     </section>
   )
 }
