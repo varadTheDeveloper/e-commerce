@@ -22,8 +22,16 @@ if (isProduction && !redisUrl) {
 if (isProduction && (process.env.OTP_SECRET ?? '').length < 32) {
   throw new Error('OTP_SECRET must be set to a random value of at least 32 characters in production')
 }
-if (isProduction && process.env.SMS_PROVIDER !== 'msg91') {
-  throw new Error('SMS_PROVIDER must be "msg91" in production (the console provider only logs codes)')
+if (isProduction && !['msg91', 'messagecentral'].includes(process.env.SMS_PROVIDER ?? '')) {
+  throw new Error('SMS_PROVIDER must be "msg91" or "messagecentral" in production (the console provider only logs codes)')
+}
+if (isProduction && process.env.SMS_PROVIDER === 'messagecentral') {
+  if (!process.env.MESSAGECENTRAL_CUSTOMER_ID || !process.env.MESSAGECENTRAL_PASSWORD) {
+    throw new Error('MESSAGECENTRAL_CUSTOMER_ID and MESSAGECENTRAL_PASSWORD must be set in production')
+  }
+  if (process.env.MESSAGECENTRAL_BASE_URL) {
+    throw new Error('MESSAGECENTRAL_BASE_URL is for tests only; leave it empty in production')
+  }
 }
 
 // With REDIS_URL set, events, workflows and locks go through Redis

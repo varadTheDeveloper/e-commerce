@@ -44,7 +44,9 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
 - Backend: translation module is listed explicitly in `medusa-config.ts` (the feature flag alone is read too late).
 - Login: `backend/src/modules/phone-otp-auth` (code hash in the auth identity's provider_metadata), routes
   `/store/otp/request` (send code, rate-limited) and `/store/otp/account` (create customer from the verified phone),
-  then `/auth/customer/phone-otp`. SMS: `backend/src/lib/sms` (console | msg91). Admin users keep emailpass.
+  then `/auth/customer/phone-otp`. SMS: `backend/src/lib/sms` (console | msg91 | messagecentral). With
+  messagecentral, Message Central makes and checks the code; we keep only their verification id (`provider_ref`)
+  and our own limits still apply. Admin users keep emailpass.
 - Wishlist: module `backend/src/modules/wishlist` + `/store/customers/me/wishlist`; storefront `WishlistProvider`
   uses the account when logged in, browser storage for guests, and merges after login.
 - Checkout and order-detail pages are still the Medusa starter (English, `@medusajs/ui`); redone in Step 4.
@@ -62,7 +64,8 @@ Run `yarn build` in backend before `yarn typecheck`: it generates `.medusa/types
 - Hindi/Marathi wording (UI and demo products) is not reviewed by a native speaker yet.
 - Brand name "Vastra", colours, logo, demo photos and size charts are placeholders. Demo photos are Unsplash
   (credited on /credits, hotlinked from images.unsplash.com); replace with the brand's photos before launch.
-- SMS needs DLT registration + MSG91 (docs/SETUP-SMS.md); until then login works only in test mode.
+- Real SMS: the client is signing up with Message Central (docs/SETUP-SMS.md, option A); until the keys are on the
+  server, login works only in test mode. Message Central is tested only against a fake of their API, not the live service.
 - Rate limits for code requests are in memory (one server); move to Redis if scaled out.
 - Pincode box only checks the format; real dates come with Shiprocket (Step 5).
 - Footer help/legal entries are plain text until those pages exist (Step 7).

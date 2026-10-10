@@ -72,8 +72,9 @@ to a colour by its `colour` metadata, or by attaching it to that colour's varian
 Customers log in with their mobile number and a 6-digit SMS code; staff log in to the admin
 with email and password. For development, `backend/.env` has `SMS_PROVIDER=console`: no SMS
 is sent and the code is printed in the backend log. Set `OTP_TEST_CODE=123456` to make every
-code 123456 (tests use this; it is ignored in production). Real SMS setup (DLT + MSG91):
-`docs/SETUP-SMS.md`.
+code 123456 (tests use this; it is ignored in production). Real SMS: Message Central
+(no DLT paperwork; `SMS_PROVIDER=messagecentral`) or your own DLT registration + MSG91
+(`SMS_PROVIDER=msg91`). Steps for both: `docs/SETUP-SMS.md`.
 
 ## Secrets
 

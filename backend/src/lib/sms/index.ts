@@ -6,21 +6,40 @@ import { maskPhone } from "../phone"
 //   to the server log. Refused in production by medusa-config.ts.
 // SMS_PROVIDER=msg91: MSG91 Flow API with a DLT-approved template whose
 //   variable holds the code (MSG91_OTP_VAR, default "otp").
+// SMS_PROVIDER=messagecentral: Message Central VerifyNow (no DLT needed).
+//   They create the code, send it and check it; we keep only their
+//   verification id. See ./messagecentral.ts.
+
+export type SmsProvider = "console" | "msg91" | "messagecentral"
 
 export type SmsConfig = {
-  provider: "console" | "msg91"
+  provider: SmsProvider
   msg91AuthKey?: string
   msg91TemplateId?: string
   msg91OtpVar?: string
+  messageCentralCustomerId?: string
+  messageCentralPassword?: string
+  /** Tests only: a fake server. Default https://cpaas.messagecentral.com */
+  messageCentralBaseUrl?: string
 }
+
+const PROVIDERS: SmsProvider[] = ["console", "msg91", "messagecentral"]
 
 export function smsConfigFromEnv(env = process.env): SmsConfig {
   return {
-    provider: env.SMS_PROVIDER === "msg91" ? "msg91" : "console",
+    provider: PROVIDERS.find((p) => p === env.SMS_PROVIDER) ?? "console",
     msg91AuthKey: env.MSG91_AUTH_KEY,
     msg91TemplateId: env.MSG91_OTP_TEMPLATE_ID,
     msg91OtpVar: env.MSG91_OTP_VAR || "otp",
+    messageCentralCustomerId: env.MESSAGECENTRAL_CUSTOMER_ID,
+    messageCentralPassword: env.MESSAGECENTRAL_PASSWORD,
+    messageCentralBaseUrl: env.MESSAGECENTRAL_BASE_URL || undefined,
   }
+}
+
+/** True when the SMS service makes and checks the code itself. */
+export function providerMakesCode(config: SmsConfig): boolean {
+  return config.provider === "messagecentral"
 }
 
 export async function sendOtpSms(
@@ -35,6 +54,9 @@ export async function sendOtpSms(
     return
   }
 
+  if (config.provider !== "msg91") {
+    throw new Error(`SMS provider ${config.provider} sends its own codes`)
+  }
   if (!config.msg91AuthKey || !config.msg91TemplateId) {
     throw new Error("MSG91_AUTH_KEY and MSG91_OTP_TEMPLATE_ID must be set")
   }

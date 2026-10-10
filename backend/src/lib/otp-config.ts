@@ -8,6 +8,6 @@ export function otpConfig(env = process.env) {
   const secret = env.OTP_SECRET || (production ? "" : DEV_SECRET)
   // A fixed code for automated tests; only with the console SMS provider, never in production.
   const testCode =
-    !production && env.SMS_PROVIDER !== "msg91" && /^\d{6}$/.test(env.OTP_TEST_CODE ?? "") ? env.OTP_TEST_CODE : undefined
+    !production && (env.SMS_PROVIDER ?? "console") === "console" && /^\d{6}$/.test(env.OTP_TEST_CODE ?? "") ? env.OTP_TEST_CODE : undefined
   return { secret, testCode, production }
 }

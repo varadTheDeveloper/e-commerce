@@ -2,6 +2,9 @@ import { createHmac, randomInt, timingSafeEqual } from "crypto"
 
 // One-time login codes. Codes are never stored: only an HMAC of
 // (phone, code) with a server secret, so a database leak reveals nothing.
+// With an SMS service that makes its own codes (Message Central), we keep
+// its verification id instead and ask it to check the code; the expiry,
+// wrong-try and resend limits below apply either way.
 
 export const OTP_LENGTH = 6
 export const OTP_TTL_MS = 5 * 60 * 1000
@@ -29,6 +32,8 @@ export function otpMatches(phone: string, code: string, secret: string, expected
 /** What we keep about the current code, inside the auth identity. */
 export type OtpState = {
   code_hash?: string | null
+  /** Verification id at the SMS service, when it made the code */
+  provider_ref?: string | null
   expires_at?: number | null
   attempts?: number
   last_sent_at?: number | null
@@ -51,12 +56,16 @@ export function canSendOtp(state: OtpState, now: number): SendDecision {
   return { ok: true }
 }
 
-/** State after a new code was issued. */
-export function issuedState(state: OtpState, codeHash: string, now: number): OtpState {
+/**
+ * State after a new code was issued. `codeHash` is null when the SMS service
+ * makes the code; its id is added with `withProviderRef` once it has sent it.
+ */
+export function issuedState(state: OtpState, codeHash: string | null, now: number): OtpState {
   const recent = (state.sends ?? []).filter((t) => now - t < 60 * 60 * 1000)
   return {
     ...state,
     code_hash: codeHash,
+    provider_ref: null,
     expires_at: now + OTP_TTL_MS,
     attempts: 0,
     last_sent_at: now,
@@ -68,25 +77,54 @@ export type VerifyResult =
   | { ok: true; state: OtpState }
   | { ok: false; reason: "no_code" | "expired" | "locked" | "wrong"; state: OtpState }
 
-/** Checks a code; returns the state to save (attempts counted, code cleared on success). */
-export function verifyOtp(state: OtpState, phone: string, code: string, secret: string, now: number): VerifyResult {
-  if (!state.code_hash || !state.expires_at) {
+/** Adds the SMS service's verification id to the code issued just now. */
+export function withProviderRef(state: OtpState, ref: string): OtpState {
+  return { ...state, code_hash: null, provider_ref: ref }
+}
+
+const cleared = (state: OtpState): OtpState => ({ ...state, code_hash: null, provider_ref: null })
+
+/**
+ * Checks done before looking at the code: is there a live code, and tries left?
+ * Returns null when the code may be checked.
+ */
+export function precheckOtp(state: OtpState, now: number): Extract<VerifyResult, { ok: false }> | null {
+  if ((!state.code_hash && !state.provider_ref) || !state.expires_at) {
     return { ok: false, reason: "no_code", state }
   }
   if (now > state.expires_at) {
-    return { ok: false, reason: "expired", state: { ...state, code_hash: null } }
+    return { ok: false, reason: "expired", state: cleared(state) }
   }
-  const attempts = state.attempts ?? 0
-  if (attempts >= OTP_MAX_ATTEMPTS) {
-    return { ok: false, reason: "locked", state: { ...state, code_hash: null } }
+  if ((state.attempts ?? 0) >= OTP_MAX_ATTEMPTS) {
+    return { ok: false, reason: "locked", state: cleared(state) }
   }
-  if (!otpMatches(phone, code, secret, state.code_hash)) {
-    const next = attempts + 1
-    return {
-      ok: false,
-      reason: "wrong",
-      state: { ...state, attempts: next, code_hash: next >= OTP_MAX_ATTEMPTS ? null : state.code_hash },
-    }
+  return null
+}
+
+/** State after a code was checked (attempts counted, code cleared on success or lock-out). */
+export function afterCheck(state: OtpState, outcome: "ok" | "wrong" | "expired", now: number): VerifyResult {
+  if (outcome === "ok") {
+    return { ok: true, state: { ...cleared(state), expires_at: null, attempts: 0, verified_at: now } }
   }
-  return { ok: true, state: { ...state, code_hash: null, expires_at: null, attempts: 0, verified_at: now } }
+  if (outcome === "expired") {
+    return { ok: false, reason: "expired", state: cleared(state) }
+  }
+  const attempts = (state.attempts ?? 0) + 1
+  return {
+    ok: false,
+    reason: "wrong",
+    state: attempts >= OTP_MAX_ATTEMPTS ? { ...cleared(state), attempts } : { ...state, attempts },
+  }
+}
+
+/** Checks a code made by this server; returns the state to save. */
+export function verifyOtp(state: OtpState, phone: string, code: string, secret: string, now: number): VerifyResult {
+  const refused = precheckOtp(state, now)
+  if (refused) {
+    return refused
+  }
+  if (!state.code_hash) {
+    return { ok: false, reason: "no_code", state }
+  }
+  return afterCheck(state, otpMatches(phone, code, secret, state.code_hash) ? "ok" : "wrong", now)
 }

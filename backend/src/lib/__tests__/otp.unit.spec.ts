@@ -1,4 +1,5 @@
 import {
+  afterCheck,
   canSendOtp,
   generateOtp,
   hashOtp,
@@ -7,7 +8,9 @@ import {
   OTP_RESEND_AFTER_MS,
   OTP_TTL_MS,
   otpMatches,
+  precheckOtp,
   verifyOtp,
+  withProviderRef,
 } from "../otp"
 
 const SECRET = "test-secret-test-secret"
@@ -73,5 +76,35 @@ describe("login codes", () => {
     state = issuedState(state, hashOtp(PHONE, "333444", SECRET), T0 + OTP_RESEND_AFTER_MS)
     expect(state.attempts).toBe(0)
     expect(verifyOtp(state, PHONE, "333444", SECRET, T0 + OTP_RESEND_AFTER_MS + 1).ok).toBe(true)
+  })
+
+  describe("codes made by the SMS service", () => {
+    const issued = () => withProviderRef(issuedState({}, null, T0), "ref-1")
+
+    it("waits for the service's id before a code can be checked", () => {
+      expect(precheckOtp(issuedState({}, null, T0), T0 + 1000)).toMatchObject({ reason: "no_code" })
+      expect(precheckOtp(issued(), T0 + 1000)).toBeNull()
+    })
+
+    it("a new code forgets the old id", () => {
+      expect(issuedState(issued(), null, T0 + OTP_RESEND_AFTER_MS).provider_ref).toBeNull()
+    })
+
+    it("clears the id after a right code, expiry or lock-out", () => {
+      expect(afterCheck(issued(), "ok", T0 + 1000)).toMatchObject({ ok: true, state: { provider_ref: null, verified_at: T0 + 1000 } })
+      expect(afterCheck(issued(), "expired", T0 + 1000)).toMatchObject({ ok: false, reason: "expired", state: { provider_ref: null } })
+      expect(precheckOtp(issued(), T0 + OTP_TTL_MS + 1)).toMatchObject({ reason: "expired", state: { provider_ref: null } })
+
+      let state = issued()
+      for (let i = 0; i < OTP_MAX_ATTEMPTS; i++) {
+        state = afterCheck(state, "wrong", T0 + 1000).state
+      }
+      expect(state).toMatchObject({ attempts: OTP_MAX_ATTEMPTS, provider_ref: null })
+      expect(precheckOtp(state, T0 + 2000)).toMatchObject({ reason: "no_code" })
+    })
+
+    it("our own check never accepts a code when the service made it", () => {
+      expect(verifyOtp(issued(), PHONE, "123456", SECRET, T0 + 1000)).toMatchObject({ ok: false, reason: "no_code" })
+    })
   })
 })
