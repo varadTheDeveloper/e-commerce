@@ -72,9 +72,9 @@ jobs:
       - name: Storefront install
         working-directory: storefront
         run: yarn install --immutable
-      - name: Storefront typecheck
+      - name: Storefront typecheck, lint and unit tests
         working-directory: storefront
-        run: yarn typecheck
+        run: yarn typecheck && yarn lint && yarn test
       - name: Storefront build
         working-directory: storefront
         run: |
@@ -83,3 +83,30 @@ jobs:
           export NEXT_PUBLIC_BASE_URL=http://localhost:8000
           export NEXT_PUBLIC_DEFAULT_REGION=in
           yarn build
+          # Keep the key for the next steps
+          echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+
+      # Browser tests: the whole shop, on a desktop and a phone screen
+      - name: Install browser
+        working-directory: storefront
+        run: npx playwright install --with-deps chromium
+      - name: Start storefront
+        working-directory: storefront
+        env:
+          MEDUSA_BACKEND_URL: http://localhost:9000
+          NEXT_PUBLIC_BASE_URL: http://localhost:8000
+          NEXT_PUBLIC_DEFAULT_REGION: in
+        run: |
+          nohup yarn start > ../storefront.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:8000/mr && exit 0; sleep 2; done
+          cat ../storefront.log; exit 1
+      - name: Browser tests
+        working-directory: storefront
+        run: yarn test:e2e
+      - name: Upload test traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: storefront/test-results
+          retention-days: 7

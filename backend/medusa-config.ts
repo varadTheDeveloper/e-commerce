@@ -60,8 +60,16 @@ module.exports = defineConfig({
       cookieSecret: secret('COOKIE_SECRET'),
     },
   },
+  featureFlags: {
+    // Product, category and collection text in Marathi, Hindi and English
+    translation: true,
+  },
   admin: {
     disable: process.env.DISABLE_MEDUSA_ADMIN === 'true',
   },
-  modules: redisModules,
+  modules: [
+    // Listed explicitly: the feature flag above is read too late to enable it.
+    { resolve: '@medusajs/medusa/translation' },
+    ...redisModules,
+  ],
 })

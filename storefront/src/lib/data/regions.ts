@@ -35,32 +35,23 @@ export const retrieveRegion = async (id: string) => {
     .catch(medusaError)
 }
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
+const DEFAULT_COUNTRY = (process.env.NEXT_PUBLIC_DEFAULT_REGION || "in").toLowerCase()
 
-export const getRegion = async (countryCode: string) => {
+/**
+ * The store sells in one region (India). The argument is the page language
+ * and is ignored; it is kept so callers can stay unchanged.
+ */
+export const getRegion = async (_locale?: string) => {
   try {
-    if (regionMap.has(countryCode)) {
-      return regionMap.get(countryCode)
-    }
-
     const regions = await listRegions()
-
-    if (!regions) {
-      return null
-    }
-
-    regions.forEach((region) => {
-      region.countries?.forEach((c) => {
-        regionMap.set(c?.iso_2 ?? "", region)
-      })
-    })
-
-    const region = countryCode
-      ? regionMap.get(countryCode)
-      : regionMap.get("us")
-
-    return region
-  } catch (e: any) {
+    return (
+      regions?.find((r) =>
+        r.countries?.some((c) => c?.iso_2 === DEFAULT_COUNTRY)
+      ) ??
+      regions?.[0] ??
+      null
+    )
+  } catch {
     return null
   }
 }

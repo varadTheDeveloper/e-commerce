@@ -51,7 +51,27 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1440px] w-full mx-auto px-4 small:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 h-12 font-semibold text-white transition-colors hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:cursor-not-allowed disabled:bg-grey-30;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent-500 px-5 h-12 font-semibold text-ink transition-colors hover:bg-accent-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 disabled:cursor-not-allowed disabled:bg-grey-30;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-5 h-12 font-semibold text-ink transition-colors hover:border-ink;
+  }
+
+  .chip {
+    @apply inline-flex min-w-[3rem] items-center justify-center rounded-full border border-line bg-white px-4 h-10 text-sm font-medium text-ink transition-colors hover:border-ink;
+  }
+
+  .chip-active {
+    @apply border-brand-600 bg-brand-50 text-brand-700;
   }
 
   .contrast-btn {

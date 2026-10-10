@@ -1,0 +1,42 @@
+import { BRAND } from "@config/brand"
+import { toLocale } from "@lib/i18n/config"
+import { getDictionary } from "@lib/i18n"
+import { I18nProvider } from "@lib/i18n/provider"
+import { getBaseURL } from "@lib/util/env"
+import { Metadata, Viewport } from "next"
+import { Mukta } from "next/font/google"
+import "styles/globals.css"
+
+// Mukta covers Devanagari (Marathi, Hindi) and Latin in one family.
+const mukta = Mukta({
+  subsets: ["devanagari", "latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans",
+})
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getBaseURL()),
+  title: { default: BRAND.name, template: `%s | ${BRAND.name}` },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#2f3c9e",
+}
+
+export default async function LocaleLayout(props: {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}) {
+  const locale = toLocale((await props.params).locale)
+
+  return (
+    <html lang={locale} data-mode="light" className={mukta.variable}>
+      <body className="bg-white font-sans text-ink antialiased">
+        <I18nProvider locale={locale} dictionary={getDictionary(locale)}>
+          {props.children}
+        </I18nProvider>
+      </body>
+    </html>
+  )
+}

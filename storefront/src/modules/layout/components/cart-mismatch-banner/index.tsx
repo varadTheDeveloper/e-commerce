@@ -1,55 +1,35 @@
 "use client"
 
 import { transferCart } from "@lib/data/customer"
-import { ExclamationCircleSolid } from "@medusajs/icons"
+import { useI18n } from "@lib/i18n/provider"
 import { StoreCart, StoreCustomer } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
 import { useState } from "react"
 
-function CartMismatchBanner(props: {
-  customer: StoreCustomer
-  cart: StoreCart
-}) {
+/** Shown when a logged-in customer's bag could not be moved to their account. */
+function CartMismatchBanner(props: { customer: StoreCustomer; cart: StoreCart }) {
   const { customer, cart } = props
+  const { t } = useI18n()
   const [isPending, setIsPending] = useState(false)
-  const [actionText, setActionText] = useState("Run transfer again")
 
   if (!customer || !!cart.customer_id) {
-    return
+    return null
   }
 
   const handleSubmit = async () => {
     try {
       setIsPending(true)
-      setActionText("Transferring..")
-
       await transferCart()
     } catch {
-      setActionText("Run transfer again")
       setIsPending(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center small:p-4 p-2 text-center bg-orange-300 small:gap-2 gap-1 text-sm mt-2 text-orange-800">
-      <div className="flex flex-col small:flex-row small:gap-2 gap-1 items-center">
-        <span className="flex items-center gap-1">
-          <ExclamationCircleSolid className="inline" />
-          Something went wrong when we tried to transfer your cart
-        </span>
-
-        <span>·</span>
-
-        <Button
-          variant="transparent"
-          className="hover:bg-transparent active:bg-transparent focus:bg-transparent disabled:text-orange-500 text-orange-950 p-0 bg-transparent"
-          size="base"
-          disabled={isPending}
-          onClick={handleSubmit}
-        >
-          {actionText}
-        </Button>
-      </div>
+    <div role="alert" className="flex flex-col items-center justify-center gap-1 bg-accent-100 p-2 text-center text-sm text-ink small:flex-row small:gap-2 small:p-3">
+      <span>{t.cartMismatch.text}</span>
+      <button type="button" disabled={isPending} onClick={handleSubmit} className="font-semibold text-brand-700 underline disabled:text-muted">
+        {isPending ? t.cartMismatch.transferring : t.cartMismatch.retry}
+      </button>
     </div>
   )
 }
