@@ -9,8 +9,21 @@ export const OtpAccountSchema = z.object({
   email: z.string().trim().email().max(120).optional().or(z.literal("")),
 })
 
+export const AddToWishlistSchema = z.object({
+  product_ids: z.array(z.string().min(1).max(100)).min(1).max(200),
+})
+
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/store/customers/me/wishlist*",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
+      matcher: "/store/customers/me/wishlist",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(AddToWishlistSchema)],
+    },
     {
       matcher: "/store/otp/request",
       method: ["POST"],

@@ -115,6 +115,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       selector: { id: store.id },
       update: {
+        // Shown in the admin panel; placeholder until the brand name is final
+        name: process.env.STORE_NAME || "Vastra",
         default_sales_channel_id: defaultSalesChannel[0].id,
       },
     },

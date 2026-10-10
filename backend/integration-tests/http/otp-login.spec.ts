@@ -1,5 +1,6 @@
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { Modules } from "@medusajs/framework/utils"
+import { publishableHeaders } from "./helpers"
 
 jest.setTimeout(90 * 1000)
 
@@ -14,9 +15,7 @@ medusaIntegrationTestRunner({
     let headers: Record<string, string>
 
     beforeEach(async () => {
-      const apiKeys = getContainer().resolve(Modules.API_KEY)
-      const [key] = await apiKeys.createApiKeys([{ title: "test", type: "publishable", created_by: "test" }])
-      headers = { "x-publishable-api-key": key.token }
+      headers = await publishableHeaders(getContainer)
     })
 
     const request = (phone: string) =>

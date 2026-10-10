@@ -83,6 +83,8 @@ module.exports = defineConfig({
   modules: [
     // Listed explicitly: the feature flag above is read too late to enable it.
     { resolve: '@medusajs/medusa/translation' },
+    // Saved products per customer (src/modules/wishlist)
+    { resolve: './src/modules/wishlist' },
     {
       resolve: '@medusajs/medusa/auth',
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
