@@ -24,7 +24,9 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
 
 ## Phase 1 steps
 1. (done) Setup: starters, India/INR seed, strict typecheck, CI, Docker, licence, credits.
-2. (done) Catalogue: redesign, home/category/collection/product/search pages, size+colour variants, gallery zoom, size chart, filters, sort, mr/hi/en, demo catalogue, unit + browser tests.
+2. (done) Catalogue: home/category/collection/product/search pages, size+colour variants, gallery zoom, size chart, filters, sort, mr/hi/en, demo catalogue, browser wishlist, unit + browser tests.
+   Design (approved): modern premium with an Indian touch (Westside/Zara-like): off-white, near-black, one maroon accent,
+   Tiro Devanagari Marathi headings + Mukta text, square corners, photo-led. Real demo photos from Unsplash.
 3. Account + cart: phone OTP login (needs DLT-registered SMS), addresses, saved cart, wishlist.
 4. Checkout: pincode check, Razorpay (verify on server + webhook signature), COD with limits and OTP confirm, stock hold, GST invoice.
 5. Orders + shipping: Shiprocket, tracking page, email/SMS updates, cancel before dispatch.
@@ -53,7 +55,9 @@ Run `yarn build` in backend before `yarn typecheck`: it generates `.medusa/types
 
 ## Known limits
 - Hindi/Marathi wording (UI and demo products) is not reviewed by a native speaker yet.
-- Brand name "Vastra", colours, logo, demo pictures and size charts are placeholders.
+- Brand name "Vastra", colours, logo, demo photos and size charts are placeholders. Demo photos are Unsplash
+  (credited on /credits, hotlinked from images.unsplash.com); replace with the brand's photos before launch.
+- Wishlist lives in browser storage until login (Step 3).
 - Pincode box only checks the format; real dates come with Shiprocket (Step 5).
 - Footer help/legal entries are plain text until those pages exist (Step 7).
 - `next.config.js` image hosts list only localhost and Medusa's demo buckets: add the production image host (S3/CloudFront) at deploy time.

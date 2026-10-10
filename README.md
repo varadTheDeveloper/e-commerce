@@ -58,10 +58,14 @@ The backend tests create and drop their own database. They read `DB_HOST`, `DB_U
 | Colour names and swatches | `storefront/src/lib/i18n/colours.ts` |
 | Size charts | `storefront/src/lib/size-charts.ts` |
 | Demo products (with Hindi/Marathi text) | `backend/src/scripts/data/catalogue.ts` |
-| Demo pictures (drawn by a script) | `backend/static/demo/`, made by `backend/demo-images/generate.mjs` |
+| Demo photos (Unsplash links + photographer credits) | `backend/src/scripts/data/demo-photos.json`, banners in `storefront/src/config/banners.ts` |
 
 Product, category and collection text in Hindi and Marathi is stored with Medusa's translation module
 (editable in the admin panel). Colour and size values stay in English as keys.
+
+Demo photos are free Unsplash photos, loaded from Unsplash's servers (their rules), and credited on `/credits`.
+They are stand-ins: before launch every product must show the brand's own photos. Each picture is matched
+to a colour by its `colour` metadata, or by attaching it to that colour's variants in the admin panel.
 
 ## Secrets
 
