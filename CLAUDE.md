@@ -27,7 +27,7 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
 2. (done) Catalogue: home/category/collection/product/search pages, size+colour variants, gallery zoom, size chart, filters, sort, mr/hi/en, demo catalogue, browser wishlist, unit + browser tests.
    Design (approved): modern premium with an Indian touch (Westside/Zara-like): off-white, near-black, one maroon accent,
    Tiro Devanagari Marathi headings + Mukta text, square corners, photo-led. Real demo photos from Unsplash.
-3. Account + cart: phone OTP login (needs DLT-registered SMS), addresses, saved cart, wishlist.
+3. (done) Account + bag: phone OTP login (custom auth provider `phone-otp`), Indian addresses, account wishlist, bag page.
 4. Checkout: pincode check, Razorpay (verify on server + webhook signature), COD with limits and OTP confirm, stock hold, GST invoice.
 5. Orders + shipping: Shiprocket, tracking page, email/SMS updates, cancel before dispatch.
 6. Returns + size exchange.
@@ -42,12 +42,19 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
 - Filters/sort/search are pure functions in `src/lib/util/catalog.ts` and `search.ts`, applied in memory (catalogue loaded whole, max 500).
 - Product pages are pre-built for every language (`generateStaticParams`).
 - Backend: translation module is listed explicitly in `medusa-config.ts` (the feature flag alone is read too late).
-- Cart, checkout and account pages are still the Medusa starter (English, `@medusajs/ui`); they are redone in Steps 3–4.
-  Keep `prefetch={false}` on links to them, or every page downloads their 200 KB of JS.
+- Login: `backend/src/modules/phone-otp-auth` (code hash in the auth identity's provider_metadata), routes
+  `/store/otp/request` (send code, rate-limited) and `/store/otp/account` (create customer from the verified phone),
+  then `/auth/customer/phone-otp`. SMS: `backend/src/lib/sms` (console | msg91 | messagecentral). With
+  messagecentral, Message Central makes and checks the code; we keep only their verification id (`provider_ref`)
+  and our own limits still apply. Admin users keep emailpass.
+- Wishlist: module `backend/src/modules/wishlist` + `/store/customers/me/wishlist`; storefront `WishlistProvider`
+  uses the account when logged in, browser storage for guests, and merges after login.
+- Checkout and order-detail pages are still the Medusa starter (English, `@medusajs/ui`); redone in Step 4.
+  Keep `prefetch={false}` on links to checkout, or every page downloads their 200 KB of JS.
 
 ## Checks before asking to push
 ```
-cd backend;    yarn build; yarn typecheck; yarn test:integration:http   (needs DB_HOST/DB_USERNAME/DB_PASSWORD)
+cd backend;    yarn build; yarn typecheck; yarn test:unit; yarn test:integration:http   (needs DB_HOST/DB_USERNAME/DB_PASSWORD)
 cd storefront; yarn typecheck; yarn lint; yarn test; yarn build         (build needs the backend running + publishable key)
 cd storefront; yarn start; yarn test:e2e                                (seeded backend running)
 ```
@@ -57,7 +64,9 @@ Run `yarn build` in backend before `yarn typecheck`: it generates `.medusa/types
 - Hindi/Marathi wording (UI and demo products) is not reviewed by a native speaker yet.
 - Brand name "Vastra", colours, logo, demo photos and size charts are placeholders. Demo photos are Unsplash
   (credited on /credits, hotlinked from images.unsplash.com); replace with the brand's photos before launch.
-- Wishlist lives in browser storage until login (Step 3).
+- Real SMS: the client is signing up with Message Central (docs/SETUP-SMS.md, option A); until the keys are on the
+  server, login works only in test mode. Message Central is tested only against a fake of their API, not the live service.
+- Rate limits for code requests are in memory (one server); move to Redis if scaled out.
 - Pincode box only checks the format; real dates come with Shiprocket (Step 5).
 - Footer help/legal entries are plain text until those pages exist (Step 7).
 - `next.config.js` image hosts list only localhost and Medusa's demo buckets: add the production image host (S3/CloudFront) at deploy time.

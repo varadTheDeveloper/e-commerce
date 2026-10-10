@@ -1,4 +1,4 @@
-import { loadEnv, defineConfig } from '@medusajs/framework/utils'
+import { ContainerRegistrationKeys, defineConfig, loadEnv, Modules } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
@@ -16,6 +16,22 @@ function secret(name: 'JWT_SECRET' | 'COOKIE_SECRET'): string {
 
 if (isProduction && !redisUrl) {
   throw new Error('REDIS_URL must be set in production')
+}
+
+// Login codes (phone OTP): see src/lib/otp-config.ts and docs/SETUP-SMS.md
+if (isProduction && (process.env.OTP_SECRET ?? '').length < 32) {
+  throw new Error('OTP_SECRET must be set to a random value of at least 32 characters in production')
+}
+if (isProduction && !['msg91', 'messagecentral'].includes(process.env.SMS_PROVIDER ?? '')) {
+  throw new Error('SMS_PROVIDER must be "msg91" or "messagecentral" in production (the console provider only logs codes)')
+}
+if (isProduction && process.env.SMS_PROVIDER === 'messagecentral') {
+  if (!process.env.MESSAGECENTRAL_CUSTOMER_ID || !process.env.MESSAGECENTRAL_PASSWORD) {
+    throw new Error('MESSAGECENTRAL_CUSTOMER_ID and MESSAGECENTRAL_PASSWORD must be set in production')
+  }
+  if (process.env.MESSAGECENTRAL_BASE_URL) {
+    throw new Error('MESSAGECENTRAL_BASE_URL is for tests only; leave it empty in production')
+  }
 }
 
 // With REDIS_URL set, events, workflows and locks go through Redis
@@ -53,6 +69,11 @@ module.exports = defineConfig({
     redisUrl,
     workerMode: process.env.MEDUSA_WORKER_MODE as 'shared' | 'worker' | 'server' | undefined,
     http: {
+      // Staff log in to the admin with email + password; customers with a phone code.
+      authMethodsPerActor: {
+        user: ['emailpass'],
+        customer: ['phone-otp'],
+      },
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
       authCors: process.env.AUTH_CORS!,
@@ -70,6 +91,22 @@ module.exports = defineConfig({
   modules: [
     // Listed explicitly: the feature flag above is read too late to enable it.
     { resolve: '@medusajs/medusa/translation' },
+    // Saved products per customer (src/modules/wishlist)
+    { resolve: './src/modules/wishlist' },
+    {
+      resolve: '@medusajs/medusa/auth',
+      dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
+      options: {
+        providers: [
+          { resolve: '@medusajs/medusa/auth-emailpass', id: 'emailpass' },
+          {
+            resolve: './src/modules/phone-otp-auth',
+            id: 'phone-otp',
+            options: { secret: process.env.OTP_SECRET || 'dev-only-otp-secret-change-me-0000' },
+          },
+        ],
+      },
+    },
     ...redisModules,
   ],
 })
