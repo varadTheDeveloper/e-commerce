@@ -10,6 +10,9 @@ storefront/   Next.js shop                                                   htt
 
 Both started from Medusa's MIT-licensed starters; see `CREDITS.md`.
 
+Shop addresses carry the language: `/mr/...` (Marathi, default), `/hi/...`, `/en/...`.
+Visitors without one are sent to their saved or browser language, else Marathi.
+
 ## Run it locally
 
 Needs Node 20+ (22 recommended), Docker, and Yarn (`corepack enable` once).
@@ -21,7 +24,7 @@ cd backend
 copy .env.template .env                     # Windows (macOS/Linux: cp)
 yarn install
 npx medusa db:migrate
-yarn seed                                   # sample products, India region, ₹ prices
+yarn seed                                   # demo catalogue: 12 clothes, India region, ₹ prices, mr/hi/en text
 npx medusa user -e you@example.com -p <password>   # first admin user
 yarn dev                                    # http://localhost:9000/app
 
@@ -37,10 +40,32 @@ yarn dev                                    # http://localhost:8000
 
 ```
 cd backend;    yarn build; yarn typecheck; yarn test:integration:http
-cd storefront; yarn typecheck; yarn build   # build needs the backend running
+cd storefront; yarn typecheck; yarn lint; yarn test; yarn build   # build needs the backend running
+cd storefront; yarn start; yarn test:e2e     # browser tests (desktop + phone), backend seeded with the demo catalogue
 ```
 
+Browser tests need Chromium once: `npx playwright install chromium`.
+
 The backend tests create and drop their own database. They read `DB_HOST`, `DB_USERNAME` and `DB_PASSWORD`.
+
+## Where things are
+
+| What | Where |
+|---|---|
+| Brand name, policies shown on the site | `storefront/src/config/brand.ts` |
+| Brand colours | `storefront/tailwind.config.js` (`brand`, `accent`, …) |
+| Shop texts in mr / hi / en | `storefront/src/lib/i18n/dictionaries/` |
+| Colour names and swatches | `storefront/src/lib/i18n/colours.ts` |
+| Size charts | `storefront/src/lib/size-charts.ts` |
+| Demo products (with Hindi/Marathi text) | `backend/src/scripts/data/catalogue.ts` |
+| Demo photos (Unsplash links + photographer credits) | `backend/src/scripts/data/demo-photos.json`, banners in `storefront/src/config/banners.ts` |
+
+Product, category and collection text in Hindi and Marathi is stored with Medusa's translation module
+(editable in the admin panel). Colour and size values stay in English as keys.
+
+Demo photos are free Unsplash photos, loaded from Unsplash's servers (their rules), and credited on `/credits`.
+They are stand-ins: before launch every product must show the brand's own photos. Each picture is matched
+to a colour by its `colour` metadata, or by attaching it to that colour's variants in the admin panel.
 
 ## Secrets
 

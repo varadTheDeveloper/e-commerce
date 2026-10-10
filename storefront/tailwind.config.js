@@ -21,6 +21,30 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        // Brand colours (placeholder until the client sends theirs):
+        // warm off-white, near-black, and one deep maroon accent.
+        brand: {
+          50: "#f8eeee",
+          100: "#f0dcdc",
+          200: "#dcb3b5",
+          500: "#8f2a36",
+          600: "#7a1f2b",
+          700: "#621823",
+          900: "#3b0e15",
+        },
+        accent: {
+          100: "#f4ede1",
+          400: "#c9a96e",
+          500: "#b08d57",
+          600: "#8f6f3e",
+        },
+        ink: "#1c1b19",
+        muted: "#6b665f",
+        line: "#e7e2da",
+        surface: "#f4f1ec",
+        cream: "#fbf9f6",
+        saving: "#9b2331",
+        danger: "#b3261e",
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -59,7 +83,9 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
+        heading: ["var(--font-heading)", "Georgia", "serif"],
         sans: [
+          "var(--font-sans)",
           "Inter",
           "-apple-system",
           "BlinkMacSystemFont",

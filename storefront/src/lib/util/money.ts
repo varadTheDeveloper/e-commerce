@@ -13,14 +13,20 @@ export const convertToLocale = ({
   currency_code,
   minimumFractionDigits,
   maximumFractionDigits,
-  locale = "en-US",
+  // en-IN gives Indian grouping (₹1,29,999) with Latin digits in every language.
+  locale = "en-IN",
 }: ConvertToLocaleParams) => {
+  const whole = Number.isInteger(amount)
   return currency_code && !isEmpty(currency_code)
     ? new Intl.NumberFormat(locale, {
         style: "currency",
         currency: currency_code,
-        minimumFractionDigits,
-        maximumFractionDigits,
+        minimumFractionDigits: minimumFractionDigits ?? (whole ? 0 : 2),
+        maximumFractionDigits: maximumFractionDigits ?? (whole ? 0 : 2),
       }).format(amount)
     : amount.toString()
 }
+
+/** ₹1,299 */
+export const formatINR = (amount: number) =>
+  convertToLocale({ amount, currency_code: "inr" })

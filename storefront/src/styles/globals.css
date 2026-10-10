@@ -51,7 +51,39 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1440px] w-full mx-auto px-4 small:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-ink px-6 h-12 text-[15px] font-medium tracking-wide text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:bg-grey-40;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 bg-brand-600 px-6 h-12 text-[15px] font-medium tracking-wide text-white transition-colors hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:cursor-not-allowed disabled:bg-grey-40;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-ink bg-transparent px-6 h-12 text-[15px] font-medium tracking-wide text-ink transition-colors hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:border-line disabled:text-muted disabled:hover:bg-transparent;
+  }
+
+  .chip {
+    @apply inline-flex min-w-[3rem] items-center justify-center border border-line bg-white px-4 h-10 text-sm text-ink transition-colors hover:border-ink;
+  }
+
+  .chip-active {
+    @apply border-ink bg-ink text-white;
+  }
+
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-[0.18em] text-muted;
+  }
+
+  .heading-xl {
+    @apply font-heading text-[2rem] leading-[1.15] small:text-5xl;
+  }
+
+  .heading-lg {
+    @apply font-heading text-2xl leading-tight small:text-[2rem];
   }
 
   .contrast-btn {
