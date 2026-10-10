@@ -61,6 +61,11 @@ jobs:
       - name: Migrate and seed sample data
         working-directory: backend
         run: npx medusa db:migrate && yarn seed
+      # The storefront needs the publishable key even to lint (next.config.js checks it)
+      - name: Share the publishable key with later steps
+        run: |
+          KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type='publishable' limit 1")
+          echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$KEY" >> "$GITHUB_ENV"
       - name: Start backend
         working-directory: backend
         run: |
@@ -77,14 +82,11 @@ jobs:
         run: yarn typecheck && yarn lint && yarn test
       - name: Storefront build
         working-directory: storefront
-        run: |
-          export NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type='publishable' limit 1")
-          export MEDUSA_BACKEND_URL=http://localhost:9000
-          export NEXT_PUBLIC_BASE_URL=http://localhost:8000
-          export NEXT_PUBLIC_DEFAULT_REGION=in
-          yarn build
-          # Keep the key for the next steps
-          echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+        env:
+          MEDUSA_BACKEND_URL: http://localhost:9000
+          NEXT_PUBLIC_BASE_URL: http://localhost:8000
+          NEXT_PUBLIC_DEFAULT_REGION: in
+        run: yarn build
 
       # Browser tests: the whole shop, on a desktop and a phone screen
       - name: Install browser
