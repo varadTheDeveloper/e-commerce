@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ecommerce
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/ecommerce
+      REDIS_URL: redis://localhost:6379
+      STORE_CORS: http://localhost:8000
+      ADMIN_CORS: http://localhost:9000
+      AUTH_CORS: http://localhost:9000,http://localhost:8000
+      MEDUSA_DISABLE_TELEMETRY: "true"
+      # Used by the integration tests to create a throwaway database
+      DB_HOST: localhost
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: corepack enable
+
+      # Backend
+      - name: Backend install
+        working-directory: backend
+        run: yarn install --immutable
+      - name: Backend build (also generates types)
+        working-directory: backend
+        run: yarn build
+      - name: Backend typecheck
+        working-directory: backend
+        run: yarn typecheck
+      - name: Backend tests
+        working-directory: backend
+        run: yarn test:integration:http
+      - name: Migrate and seed sample data
+        working-directory: backend
+        run: npx medusa db:migrate && yarn seed
+      - name: Start backend
+        working-directory: backend
+        run: |
+          nohup yarn dev > ../backend.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:9000/health && exit 0; sleep 2; done
+          cat ../backend.log; exit 1
+
+      # Storefront (its build reads products from the running backend)
+      - name: Storefront install
+        working-directory: storefront
+        run: yarn install --immutable
+      - name: Storefront typecheck
+        working-directory: storefront
+        run: yarn typecheck
+      - name: Storefront build
+        working-directory: storefront
+        run: |
+          export NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type='publishable' limit 1")
+          export MEDUSA_BACKEND_URL=http://localhost:9000
+          export NEXT_PUBLIC_BASE_URL=http://localhost:8000
+          export NEXT_PUBLIC_DEFAULT_REGION=in
+          yarn build
