@@ -39,9 +39,9 @@ yarn dev                                    # http://localhost:8000
 ## Checks (also run on GitHub for every push and pull request)
 
 ```
-cd backend;    yarn build; yarn typecheck; yarn test:integration:http
+cd backend;    yarn build; yarn typecheck; yarn test:unit; yarn test:integration:http
 cd storefront; yarn typecheck; yarn lint; yarn test; yarn build   # build needs the backend running
-cd storefront; yarn start; yarn test:e2e     # browser tests (desktop + phone), backend seeded with the demo catalogue
+cd storefront; yarn start; yarn test:e2e     # browser tests (desktop + phone); backend seeded, with OTP_TEST_CODE=123456
 ```
 
 Browser tests need Chromium once: `npx playwright install chromium`.
@@ -67,7 +67,16 @@ Demo photos are free Unsplash photos, loaded from Unsplash's servers (their rule
 They are stand-ins: before launch every product must show the brand's own photos. Each picture is matched
 to a colour by its `colour` metadata, or by attaching it to that colour's variants in the admin panel.
 
+## Customer login (phone codes)
+
+Customers log in with their mobile number and a 6-digit SMS code; staff log in to the admin
+with email and password. For development, `backend/.env` has `SMS_PROVIDER=console`: no SMS
+is sent and the code is printed in the backend log. Set `OTP_TEST_CODE=123456` to make every
+code 123456 (tests use this; it is ignored in production). Real SMS setup (DLT + MSG91):
+`docs/SETUP-SMS.md`.
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.
-In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET` and `REDIS_URL`.
+In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET`, `OTP_SECRET` and `REDIS_URL`,
+or with the console SMS provider.

@@ -34,6 +34,9 @@ jobs:
       ADMIN_CORS: http://localhost:9000
       AUTH_CORS: http://localhost:9000,http://localhost:8000
       MEDUSA_DISABLE_TELEMETRY: "true"
+      # Test mode for phone login: no SMS, every code is 123456 (refused in production)
+      SMS_PROVIDER: console
+      OTP_TEST_CODE: "123456"
       # Used by the integration tests to create a throwaway database
       DB_HOST: localhost
       DB_USERNAME: postgres
@@ -57,7 +60,7 @@ jobs:
         run: yarn typecheck
       - name: Backend tests
         working-directory: backend
-        run: yarn test:integration:http
+        run: yarn test:unit && yarn test:integration:http
       - name: Migrate and seed sample data
         working-directory: backend
         run: npx medusa db:migrate && yarn seed

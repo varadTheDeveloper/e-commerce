@@ -8,7 +8,9 @@ import { sendOtpSms, smsConfigFromEnv } from "../../../../lib/sms"
 
 // At most 10 code requests per network address per 15 minutes
 // (each number also has its own 30-second wait and 5-per-hour cap).
-const perIp = new RateLimiter(10, 15 * 60 * 1000)
+// Test mode (fixed code, never in production) allows more, so automated
+// tests can sign up many customers from one machine.
+const perIp = new RateLimiter(otpConfig().testCode ? 1000 : 10, 15 * 60 * 1000)
 
 export type OtpRequestBody = { phone: string }
 
