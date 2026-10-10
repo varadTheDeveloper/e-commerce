@@ -16,15 +16,8 @@ const MAX_QTY = 10
 
 type Line = HttpTypes.StoreCartLineItem
 
-function optionValue(item: Line, title: string): string | undefined {
-  return item.variant?.options?.find((o) => o.option?.title === title)?.value
-}
-
-/** Picture of the chosen colour (tagged in image metadata), else the product picture. */
-function lineImage(item: Line, colour?: string): string | null | undefined {
-  const tagged = colour ? item.product?.images?.find((i) => i.metadata?.colour === colour)?.url : undefined
-  return tagged ?? item.thumbnail
-}
+/** Name, size, colour and picture of a bag line, looked up in the catalogue (in the page language). */
+export type LineDetails = { title?: string; size?: string; colour?: string; image?: string }
 
 /** MRP and selling price for a line (MRP falls back to the selling price). */
 export function linePrices(item: Line) {
@@ -44,7 +37,15 @@ export function bagTotals(items: Line[]) {
   return { mrp, price, discount: mrp - price }
 }
 
-export default function BagView({ cart, loggedIn }: { cart: HttpTypes.StoreCart; loggedIn: boolean }) {
+export default function BagView({
+  cart,
+  loggedIn,
+  details,
+}: {
+  cart: HttpTypes.StoreCart
+  loggedIn: boolean
+  details: Record<string, LineDetails>
+}) {
   const { locale, t } = useI18n()
   const router = useRouter()
   const wishlist = useWishlist()
@@ -97,12 +98,12 @@ export default function BagView({ cart, loggedIn }: { cart: HttpTypes.StoreCart;
           <ul className="divide-y divide-line border-y border-line">
             {items.map((item) => {
               const p = linePrices(item)
-              const size = optionValue(item, "Size")
-              const colour = optionValue(item, "Colour")
+              const d = details[item.id] ?? {}
+              const { size, colour } = d
               const handle = item.product_handle ?? item.product?.handle ?? ""
               const off = p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0
               const lineBusy = busy === item.id && pending
-              const image = lineImage(item, colour)
+              const image = d.image ?? item.thumbnail
               return (
                 <li key={item.id} className={`flex gap-4 py-5 ${lineBusy ? "opacity-60" : ""}`} data-testid="bag-item">
                   <LocalizedClientLink href={`/products/${handle}`} className="relative aspect-[4/5] w-24 shrink-0 overflow-hidden bg-surface small:w-28">
@@ -110,7 +111,7 @@ export default function BagView({ cart, loggedIn }: { cart: HttpTypes.StoreCart;
                   </LocalizedClientLink>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <LocalizedClientLink href={`/products/${handle}`} className="line-clamp-2 text-[15px] hover:underline" data-testid="bag-item-title">
-                      {item.product_title}
+                      {d.title ?? item.product_title}
                     </LocalizedClientLink>
                     <p className="text-[13px] text-muted">
                       {size && `${t.bag.size}: ${size}`}
