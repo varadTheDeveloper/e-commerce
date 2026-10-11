@@ -38,6 +38,8 @@ import {
   PRODUCTS,
 } from "./data/catalogue";
 import DEMO_PHOTOS from "./data/demo-photos.json";
+import { SHOP } from "../config/shop";
+import { COD_PROVIDER_ID, RAZORPAY_PROVIDER_ID } from "../lib/payment-ids";
 
 const updateStoreCurrencies = createWorkflow(
   "update-store-currencies",
@@ -129,7 +131,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
           name: "India",
           currency_code: "inr",
           countries,
-          payment_providers: ["pp_system_default"],
+          // Only real payment methods: never "pp_system_default", which accepts every order unpaid
+          payment_providers: [RAZORPAY_PROVIDER_ID, COD_PROVIDER_ID],
         },
       ],
     },
@@ -229,61 +232,26 @@ export default async function seedDemoData({ container }: ExecArgs) {
     },
   });
 
+  // One delivery option: free from SHOP.freeShippingFrom, else SHOP.shippingFee
   await createShippingOptionsWorkflow(container).run({
     input: [
       {
-        name: "Standard Shipping",
+        name: "Standard delivery",
         price_type: "flat",
         provider_id: "manual_manual",
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: {
           label: "Standard",
-          description: "Ship in 2-3 days.",
+          description: "Delivered in 3-7 days.",
           code: "standard",
         },
         prices: [
+          { currency_code: "inr", amount: SHOP.shippingFee },
           {
             currency_code: "inr",
-            amount: 49,
-          },
-          {
-            region_id: region.id,
-            amount: 49,
-          },
-        ],
-        rules: [
-          {
-            attribute: "enabled_in_store",
-            value: "true",
-            operator: "eq",
-          },
-          {
-            attribute: "is_return",
-            value: "false",
-            operator: "eq",
-          },
-        ],
-      },
-      {
-        name: "Express Shipping",
-        price_type: "flat",
-        provider_id: "manual_manual",
-        service_zone_id: fulfillmentSet.service_zones[0].id,
-        shipping_profile_id: shippingProfile.id,
-        type: {
-          label: "Express",
-          description: "Ship in 24 hours.",
-          code: "express",
-        },
-        prices: [
-          {
-            currency_code: "inr",
-            amount: 99,
-          },
-          {
-            region_id: region.id,
-            amount: 99,
+            amount: 0,
+            rules: [{ attribute: "item_total", operator: "gte", value: SHOP.freeShippingFrom }],
           },
         ],
         rules: [
