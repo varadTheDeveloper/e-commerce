@@ -47,6 +47,8 @@ export type ProductDef = {
     size_chart: "men-top" | "men-bottom" | "women-top" | "women-bottom" | "kids"
     care: "machine-cold" | "dry-clean" | "hand-wash"
     country_of_origin: "IN"
+    /** HSN code for the GST invoice (4 digits; confirm with the accountant) */
+    hsn: string
   }
   /** Stock per variant; `${size}/${colour}` overrides the default of 40. */
   stock?: Record<string, number>
@@ -106,7 +108,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "मऊ आणि हवेशीर 100% कॉटन टी-शर्ट, क्लासिक क्रू नेकसह. दिवसभर घालायला आरामदायी.",
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
-    metadata: { fabric: "cotton", fit: "regular", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "regular", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN", hsn: "6109" },
     stock: { "XXL/black": 0, "S/white": 3 },
     badge: "bestseller",
   },
@@ -130,7 +132,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "बटन-डाउन कॉलर असलेला कडक कॉटन ऑक्सफर्ड शर्ट. ऑफिससाठी स्मार्ट, सुट्टीच्या दिवशी आरामदायी.",
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
-    metadata: { fabric: "cotton", fit: "slim", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "slim", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN", hsn: "6205" },
     stock: { "S/sky-blue": 0 },
   },
   {
@@ -156,7 +158,7 @@ export const PRODUCTS: ProductDef[] = [
       hi: "लिनन ब्लेंड (60% लिनन, 40% कॉटन)",
       mr: "लिनन ब्लेंड (60% लिनन, 40% कॉटन)",
     },
-    metadata: { fabric: "linen", fit: "relaxed", size_chart: "men-top", care: "hand-wash", country_of_origin: "IN" },
+    metadata: { fabric: "linen", fit: "relaxed", size_chart: "men-top", care: "hand-wash", country_of_origin: "IN", hsn: "6205" },
   },
   {
     handle: "cotton-straight-kurta",
@@ -178,7 +180,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "मँडरिन कॉलर असलेला क्लासिक स्ट्रेट-कट कॉटन कुर्ता. पूजा, कौटुंबिक कार्यक्रम आणि रोजच्या वापरासाठी उत्तम.",
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
-    metadata: { fabric: "cotton", fit: "regular", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "regular", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN", hsn: "6211" },
   },
   {
     handle: "festive-silk-blend-kurta",
@@ -200,7 +202,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "हलकी चमक असलेला सिल्क-ब्लेंड कुर्ता, लग्नसमारंभ आणि सणांसाठी.",
     },
     material: { en: "Silk Blend", hi: "सिल्क ब्लेंड", mr: "सिल्क ब्लेंड" },
-    metadata: { fabric: "silk", fit: "regular", size_chart: "men-top", care: "dry-clean", country_of_origin: "IN" },
+    metadata: { fabric: "silk", fit: "regular", size_chart: "men-top", care: "dry-clean", country_of_origin: "IN", hsn: "6211" },
     stock: { "M/royal-blue": 2 },
   },
   {
@@ -226,7 +228,7 @@ export const PRODUCTS: ProductDef[] = [
       hi: "डेनिम (98% कॉटन, 2% इलास्टेन)",
       mr: "डेनिम (98% कॉटन, 2% इलास्टेन)",
     },
-    metadata: { fabric: "denim", fit: "slim", size_chart: "men-bottom", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "denim", fit: "slim", size_chart: "men-bottom", care: "machine-cold", country_of_origin: "IN", hsn: "6203" },
     stock: { "36/indigo": 0 },
     badge: "bestseller",
   },
@@ -250,7 +252,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "मऊ रेयॉनमधील सैलसर ए-लाइन कुर्ता. लेगिंग्ज किंवा पलाझोसोबत घाला.",
     },
     material: { en: "100% Rayon", hi: "100% रेयॉन", mr: "100% रेयॉन" },
-    metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN" },
+    metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN", hsn: "6211" },
   },
   {
     handle: "flowy-maxi-dress",
@@ -272,7 +274,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "प्रत्येक पावलासोबत लहरणारा, पूर्ण लांबीचा ड्रेस. लग्नसमारंभ, पार्ट्या आणि संध्याकाळच्या बाहेर फिरण्यासाठी.",
     },
     material: { en: "100% Rayon", hi: "100% रेयॉन", mr: "100% रेयॉन" },
-    metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN" },
+    metadata: { fabric: "rayon", fit: "regular", size_chart: "women-top", care: "hand-wash", country_of_origin: "IN", hsn: "6204" },
   },
   {
     handle: "womens-everyday-cotton-t-shirt",
@@ -293,7 +295,7 @@ export const PRODUCTS: ProductDef[] = [
       mr: "रोजच्या आरामासाठी मऊ, रेग्युलर-फिट कॉटन टी-शर्ट.",
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
-    metadata: { fabric: "cotton", fit: "regular", size_chart: "women-top", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "regular", size_chart: "women-top", care: "machine-cold", country_of_origin: "IN", hsn: "6109" },
   },
   {
     handle: "unisex-fleece-hoodie",
@@ -319,7 +321,7 @@ export const PRODUCTS: ProductDef[] = [
       hi: "फ़्लीस (60% कॉटन, 40% पॉलिएस्टर)",
       mr: "फ्लीस (60% कॉटन, 40% पॉलिएस्टर)",
     },
-    metadata: { fabric: "fleece", fit: "relaxed", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "fleece", fit: "relaxed", size_chart: "men-top", care: "machine-cold", country_of_origin: "IN", hsn: "6110" },
   },
   {
     handle: "womens-cotton-joggers",
@@ -344,7 +346,7 @@ export const PRODUCTS: ProductDef[] = [
       hi: "कॉटन लाइक्रा (95% कॉटन, 5% स्पैन्डेक्स)",
       mr: "कॉटन लायक्रा (95% कॉटन, 5% स्पॅन्डेक्स)",
     },
-    metadata: { fabric: "cotton", fit: "relaxed", size_chart: "women-bottom", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "relaxed", size_chart: "women-bottom", care: "machine-cold", country_of_origin: "IN", hsn: "6104" },
   },
   {
     handle: "kids-cotton-t-shirt",
@@ -365,6 +367,6 @@ export const PRODUCTS: ProductDef[] = [
       mr: "कधीही शांत न बसणाऱ्या चिमुकल्यांसाठी मऊ, त्वचेला सौम्य कॉटन टी-शर्ट.",
     },
     material: { en: "100% Cotton", hi: "100% कॉटन", mr: "100% कॉटन" },
-    metadata: { fabric: "cotton", fit: "regular", size_chart: "kids", care: "machine-cold", country_of_origin: "IN" },
+    metadata: { fabric: "cotton", fit: "regular", size_chart: "kids", care: "machine-cold", country_of_origin: "IN", hsn: "6109" },
   },
 ]

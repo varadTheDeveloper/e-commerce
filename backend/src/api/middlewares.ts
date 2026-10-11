@@ -13,6 +13,9 @@ export const AddToWishlistSchema = z.object({
   product_ids: z.array(z.string().min(1).max(100)).min(1).max(200),
 })
 
+export const CodRequestSchema = z.object({ cart_id: z.string().min(1).max(100) })
+export const CodConfirmSchema = z.object({ cart_id: z.string().min(1).max(100), code: z.string().regex(/^\d{6}$/).optional() })
+
 export default defineMiddlewares({
   routes: [
     {
@@ -23,6 +26,25 @@ export default defineMiddlewares({
       matcher: "/store/customers/me/wishlist",
       method: ["POST"],
       middlewares: [validateAndTransformBody(AddToWishlistSchema)],
+    },
+    {
+      matcher: "/store/orders/:id/invoice",
+      method: ["GET"],
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
+      matcher: "/store/cod*",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
+      matcher: "/store/cod/request",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(CodRequestSchema)],
+    },
+    {
+      matcher: "/store/cod/confirm",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(CodConfirmSchema)],
     },
     {
       matcher: "/store/otp/request",

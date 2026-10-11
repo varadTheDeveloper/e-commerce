@@ -1,4 +1,6 @@
 import { ContainerRegistrationKeys, defineConfig, loadEnv, Modules } from '@medusajs/framework/utils'
+import { SHOP } from './src/config/shop'
+import { otpConfig } from './src/lib/otp-config'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
@@ -31,6 +33,18 @@ if (isProduction && process.env.SMS_PROVIDER === 'messagecentral') {
   }
   if (process.env.MESSAGECENTRAL_BASE_URL) {
     throw new Error('MESSAGECENTRAL_BASE_URL is for tests only; leave it empty in production')
+  }
+}
+
+// Online payments (Razorpay): see docs/SETUP-PAYMENTS.md
+if (isProduction) {
+  for (const name of ['RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET', 'RAZORPAY_WEBHOOK_SECRET'] as const) {
+    if (!process.env[name]) {
+      throw new Error(`${name} must be set in production`)
+    }
+  }
+  if (process.env.RAZORPAY_API_BASE) {
+    throw new Error('RAZORPAY_API_BASE is for tests only; leave it empty in production')
   }
 }
 
@@ -102,7 +116,32 @@ module.exports = defineConfig({
           {
             resolve: './src/modules/phone-otp-auth',
             id: 'phone-otp',
-            options: { secret: process.env.OTP_SECRET || 'dev-only-otp-secret-change-me-0000' },
+            options: { secret: otpConfig().secret },
+          },
+        ],
+      },
+    },
+    {
+      resolve: '@medusajs/medusa/payment',
+      options: {
+        providers: [
+          {
+            resolve: './src/modules/razorpay',
+            id: 'razorpay',
+            options: {
+              keyId: process.env.RAZORPAY_KEY_ID,
+              keySecret: process.env.RAZORPAY_KEY_SECRET,
+              webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+              apiBaseUrl: process.env.RAZORPAY_API_BASE,
+            },
+          },
+          {
+            resolve: './src/modules/cod',
+            id: 'cod',
+            options: {
+              secret: otpConfig().secret,
+              maxOrder: SHOP.codMaxOrder,
+            },
           },
         ],
       },

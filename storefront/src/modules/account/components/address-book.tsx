@@ -10,7 +10,7 @@ import { useState, useTransition } from "react"
 const field =
   "h-12 w-full border border-line bg-white px-4 text-[16px] text-ink focus:border-ink focus:outline-none aria-[invalid=true]:border-danger"
 
-function toInput(a?: HttpTypes.StoreCustomerAddress, customer?: HttpTypes.StoreCustomer): AddressInput {
+export function toInput(a?: HttpTypes.StoreCustomerAddress, customer?: HttpTypes.StoreCustomer): AddressInput {
   const meta = (a?.metadata ?? {}) as { landmark?: string; type?: string }
   return {
     fullName: a?.first_name ?? [customer?.first_name, customer?.last_name].filter(Boolean).join(" "),
@@ -122,7 +122,7 @@ export default function AddressBook({ customer }: { customer: HttpTypes.StoreCus
   )
 }
 
-function AddressForm({
+export function AddressForm({
   id,
   initial,
   title,

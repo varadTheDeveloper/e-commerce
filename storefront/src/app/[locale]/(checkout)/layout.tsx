@@ -1,34 +1,31 @@
+import { getDictionary } from "@lib/i18n"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import ChevronDown from "@modules/common/icons/chevron-down"
 import Logo from "@modules/layout/components/header/logo"
 
-export default function CheckoutLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+/** Checkout: a quiet header (no menus) so customers can finish without distraction. */
+export default async function CheckoutLayout(props: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const t = getDictionary((await props.params).locale)
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
-      <div className="h-16 bg-white border-b ">
-        <nav className="flex h-full items-center content-container justify-between">
-          <LocalizedClientLink
-            href="/cart"
-            className="text-small-semi text-ui-fg-base flex items-center gap-x-2 uppercase flex-1 basis-0"
-            data-testid="back-to-cart-link"
-          >
-            <ChevronDown className="rotate-90" size={16} />
-            <span className="mt-px hidden small:block txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base ">
-              Back to shopping cart
-            </span>
-            <span className="mt-px block small:hidden txt-compact-plus text-ui-fg-subtle hover:text-ui-fg-base">
-              Back
-            </span>
+    <div className="min-h-screen w-full">
+      <header className="border-b border-line bg-white">
+        <nav className="content-container flex h-16 items-center justify-between">
+          <LocalizedClientLink href="/cart" prefetch={false} className="flex flex-1 basis-0 items-center gap-2 text-sm" data-testid="back-to-cart-link">
+            <span aria-hidden>←</span>
+            <span className="hidden small:inline">{t.checkout.backToBag}</span>
           </LocalizedClientLink>
           <Logo />
-          <div className="flex-1 basis-0" />
+          <p className="flex flex-1 basis-0 items-center justify-end gap-1.5 text-[13px] text-muted">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <rect x="4" y="10" width="16" height="11" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+            </svg>
+            <span className="hidden small:inline">{t.checkout.secure}</span>
+          </p>
         </nav>
-      </div>
-      <div className="relative" data-testid="checkout-container">{children}</div>
+      </header>
+      <main id="main" data-testid="checkout-container">
+        {props.children}
+      </main>
     </div>
   )
 }

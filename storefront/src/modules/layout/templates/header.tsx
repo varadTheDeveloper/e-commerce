@@ -30,7 +30,7 @@ export default async function Header({ locale, t }: { locale: string; t: Diction
   const notices = [
     BRAND.cashOnDelivery ? t.header.cod : null,
     t.header.easyReturns,
-    BRAND.freeDeliveryAbove ? format(t.header.freeDelivery, { amount: BRAND.freeDeliveryAbove }) : null,
+    BRAND.freeDeliveryFrom ? format(t.header.freeDelivery, { amount: BRAND.freeDeliveryFrom }) : null,
   ].filter(Boolean)
 
   return (

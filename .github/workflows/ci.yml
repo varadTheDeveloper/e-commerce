@@ -69,9 +69,16 @@ jobs:
         run: |
           KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type='publishable' limit 1")
           echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$KEY" >> "$GITHUB_ENV"
+      # Online payments go to a fake Razorpay on localhost (test keys only, refused in production)
       - name: Start backend
         working-directory: backend
+        env:
+          RAZORPAY_KEY_ID: rzp_test_fake
+          RAZORPAY_KEY_SECRET: fake-secret
+          RAZORPAY_WEBHOOK_SECRET: ci-webhook-secret
+          RAZORPAY_API_BASE: http://127.0.0.1:9911
         run: |
+          nohup node integration-tests/fake-razorpay.js > ../fake-razorpay.log 2>&1 &
           nohup yarn dev > ../backend.log 2>&1 &
           for i in $(seq 1 60); do curl -sf http://localhost:9000/health && exit 0; sleep 2; done
           cat ../backend.log; exit 1
