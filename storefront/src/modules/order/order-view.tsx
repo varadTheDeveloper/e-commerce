@@ -5,10 +5,38 @@ import { Locale } from "@lib/i18n/config"
 import { formatMobile } from "@lib/india"
 import { COD_PROVIDER_ID } from "@lib/util/checkout"
 import { formatINR } from "@lib/util/money"
+import { OrderTracking } from "@lib/data/orders"
 import { HttpTypes } from "@medusajs/types"
 import { LineDetails } from "@modules/bag/bag-view"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
+import CancelOrder from "./cancel-order"
+
+type Step = "placed" | "packed" | "shipped" | "out_for_delivery" | "delivered"
+/** Which delivery steps the order has reached, and when. */
+function deliverySteps(order: HttpTypes.StoreOrder, tracking: OrderTracking["tracking"]) {
+  const fulfillment = (order.fulfillments ?? []).find((f) => !f.canceled_at)
+  const seen = (stage: string) => tracking?.history?.find((h) => h.stage === stage)?.at
+  const at: Record<Step, string | null | undefined> = {
+    placed: String(order.created_at),
+    packed: fulfillment ? String(fulfillment.packed_at ?? fulfillment.created_at) : null,
+    shipped: fulfillment?.shipped_at ? String(fulfillment.shipped_at) : seen("shipped"),
+    out_for_delivery: seen("out_for_delivery"),
+    delivered: fulfillment?.delivered_at ? String(fulfillment.delivered_at) : seen("delivered"),
+  }
+  // A later step implies the earlier ones
+  const order_: Step[] = ["placed", "packed", "shipped", "out_for_delivery", "delivered"]
+  const last = Math.max(...order_.map((s, i) => (at[s] ? i : -1)))
+  return {
+    steps: order_.map((s, i) => ({ step: s, done: i <= last, at: at[s] })),
+    shipped: last >= 2,
+    note: tracking && ["delivery_failed", "returning", "returned"].includes(tracking.stage) ? (tracking.stage as "delivery_failed" | "returning" | "returned") : null,
+    // From the courier's updates
+    awb: tracking?.awb,
+    trackingUrl: tracking?.url,
+    courier: tracking?.courier,
+  }
+}
 
 /** An order in the shop's design: after placing it, and under My orders. */
 export default function OrderView({
@@ -17,8 +45,10 @@ export default function OrderView({
   locale,
   t,
   placed,
+  tracking,
 }: {
   order: HttpTypes.StoreOrder
+  tracking: OrderTracking
   details: Record<string, LineDetails>
   locale: Locale
   t: Dictionary
@@ -36,6 +66,11 @@ export default function OrderView({
   })
   const status = o.statuses[order.status as keyof typeof o.statuses] ?? order.status
   const items = [...(order.items ?? [])].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)))
+  const canceled = order.status === "canceled"
+  const delivery = deliverySteps(order, tracking.tracking)
+  const canCancel = !canceled && order.status !== "completed" && !delivery.shipped
+  const shortDay = (d: string) =>
+    new Date(d).toLocaleDateString(locale === "en" ? "en-IN" : `${locale}-IN`, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" })
 
   return (
     <div className="content-container max-w-3xl py-8 small:py-12" data-testid="order-view">
@@ -57,7 +92,8 @@ export default function OrderView({
             <h1 className="heading-lg" data-testid="order-number">{format(o.number, { number: order.display_id ?? "" })}</h1>
           )}
           <p className="text-sm text-muted">
-            {format(o.placedOn, { date })} · {o.status}: {status}
+            {format(o.placedOn, { date })}
+            {canceled && <> · {o.status}: {status}</>}
           </p>
         </div>
         <a href={`/api/invoice/${order.id}`} target="_blank" rel="noopener" className="btn-outline h-10 px-4 text-sm" data-testid="invoice-link">
@@ -65,7 +101,46 @@ export default function OrderView({
         </a>
       </div>
 
-      <section className="mt-6 border border-line bg-white p-5">
+      {canceled ? (
+        <section className="mt-6 border border-line bg-white p-5 text-sm" data-testid="order-canceled">
+          <p className="font-medium">
+            {format(o.canceledOn, { date: shortDay(String(tracking.canceled_at ?? order.updated_at)) })}
+          </p>
+          {!isCod && <p className="mt-1 text-muted">{o.refundNote}</p>}
+        </section>
+      ) : (
+        <section className="mt-6 border border-line bg-white p-5" data-testid="order-tracking">
+          <h2 className="eyebrow mb-4">{o.tracking}</h2>
+          <ol className="grid grid-cols-5 gap-1 text-center text-[12px] small:text-[13px]">
+            {delivery.steps.map(({ step, done, at }) => (
+              <li key={step} className="flex flex-col items-center gap-2" data-testid={`track-${step}`} data-done={done}>
+                <span className={`h-1.5 w-full ${done ? "bg-ink" : "bg-line"}`} aria-hidden />
+                <span className={done ? "font-medium" : "text-muted"}>{o.steps[step]}</span>
+                {done && at && <span className="text-muted">{shortDay(at)}</span>}
+              </li>
+            ))}
+          </ol>
+          {delivery.note && <p className="mt-4 bg-surface px-3 py-2 text-sm">{o.trackingNotes[delivery.note]}</p>}
+          {delivery.awb && (
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              {delivery.courier && <span>{format(o.courier, { name: delivery.courier })}</span>}
+              <span className="text-muted">{format(o.trackingNumber, { awb: delivery.awb })}</span>
+              {delivery.trackingUrl && (
+                <a href={delivery.trackingUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" data-testid="track-link">
+                  {o.trackParcel}
+                </a>
+              )}
+            </div>
+          )}
+          {canCancel && (
+            <div className="mt-4 border-t border-line pt-4">
+              <CancelOrder orderId={order.id} />
+            </div>
+          )}
+        </section>
+      )}
+
+      <section className="mt-4 border border-line bg-white p-5">
         <h2 className="eyebrow mb-4">{o.items}</h2>
         <ul className="divide-y divide-line">
           {items.map((item) => {
@@ -119,7 +194,9 @@ export default function OrderView({
         <section className="border border-line bg-white p-5 text-sm" data-testid="order-payment">
           <h2 className="eyebrow mb-3">{o.payment}</h2>
           <p>{isCod ? o.cod : o.paidOnline}</p>
-          {isCod && <p className="mt-1 text-muted">{format(o.codDue, { amount: formatINR(Number(order.total)) })}</p>}
+          {isCod && !canceled && !delivery.steps[4].done && (
+            <p className="mt-1 text-muted">{format(o.codDue, { amount: formatINR(Number(order.total)) })}</p>
+          )}
         </section>
       </div>
 

@@ -1,6 +1,6 @@
 import { listProductsFor } from "@lib/data/catalog"
 import { retrieveCustomer } from "@lib/data/customer"
-import { retrieveOrder } from "@lib/data/orders"
+import { retrieveOrder, retrieveOrderTracking } from "@lib/data/orders"
 import { format, getDictionary } from "@lib/i18n"
 import { toLocale } from "@lib/i18n/config"
 import { lineDetails } from "@lib/util/line-details"
@@ -20,12 +20,13 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function OrderDetailPage(props: Props) {
   const params = await props.params
   const locale = toLocale(params.locale)
-  const [order, customer, products] = await Promise.all([
+  const [order, customer, products, tracking] = await Promise.all([
     retrieveOrder(params.id).catch(() => null),
     retrieveCustomer().catch(() => null),
     listProductsFor(locale).catch(() => []),
+    retrieveOrderTracking(params.id),
   ])
   // Only the customer's own orders
   if (!order || !customer || order.customer_id !== customer.id) notFound()
-  return <OrderView order={order} details={lineDetails(order.items ?? [], products)} locale={locale} t={getDictionary(locale)} />
+  return <OrderView order={order} details={lineDetails(order.items ?? [], products)} locale={locale} t={getDictionary(locale)} tracking={tracking} />
 }

@@ -17,6 +17,8 @@ export type CheckoutError =
   | "payment_not_received"
   | "not_ready"
   | "cod_limit"
+  | "cod_unavailable"
+  | "not_serviceable"
   | "payment_unavailable"
   | "wrong_code"
   | "locked"
@@ -41,6 +43,8 @@ function errorFrom(e: unknown): Fail {
   const err = e as { status?: number; message?: string }
   const msg = String(err?.message ?? "")
   if (/stock/i.test(msg)) return { ok: false, error: "out_of_stock" }
+  if (/do not deliver to this pincode/i.test(msg)) return { ok: false, error: "not_serviceable" }
+  if (/cash on delivery is not available for this pincode/i.test(msg)) return { ok: false, error: "cod_unavailable" }
   if (/cash on delivery is available up to/i.test(msg)) return { ok: false, error: "cod_limit" }
   if (/delivery address/i.test(msg)) return { ok: false, error: "not_ready" }
   if (/Too many wrong codes/i.test(msg)) return { ok: false, error: "locked" }

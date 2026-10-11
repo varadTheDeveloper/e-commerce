@@ -1,22 +1,27 @@
 "use client"
 
+import { DeliveryEstimate, getDeliveryEstimate } from "@lib/data/delivery"
+import { format } from "@lib/i18n"
 import { useI18n } from "@lib/i18n/provider"
+import { shortDate } from "@lib/util/dates"
 import { PinIcon, TruckIcon } from "@modules/common/icons/ui"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 
-/**
- * Pincode check. For now it only validates the number and shows the general
- * delivery promise; real courier dates come with Shiprocket in Step 5.
- */
+/** Pincode check: can we deliver there, by when, and is cash on delivery possible. */
 export default function PincodeCheck() {
-  const { t } = useI18n()
+  const { locale, t } = useI18n()
   const [pin, setPin] = useState("")
-  const [state, setState] = useState<"idle" | "ok" | "bad">("idle")
+  const [result, setResult] = useState<DeliveryEstimate | "bad" | null>(null)
+  const [pending, start] = useTransition()
 
   const check = (e: React.FormEvent) => {
     e.preventDefault()
     // Indian pincodes: 6 digits, first digit 1-9
-    setState(/^[1-9][0-9]{5}$/.test(pin) ? "ok" : "bad")
+    if (!/^[1-9][0-9]{5}$/.test(pin)) return setResult("bad")
+    start(async () => {
+      const estimate = await getDeliveryEstimate(pin)
+      setResult(estimate ?? { serviceable: true, cod: true, date: null, checked: false })
+    })
   }
 
   return (
@@ -32,7 +37,7 @@ export default function PincodeCheck() {
             value={pin}
             onChange={(e) => {
               setPin(e.target.value.replace(/\D/g, "").slice(0, 6))
-              setState("idle")
+              setResult(null)
             }}
             inputMode="numeric"
             autoComplete="postal-code"
@@ -42,18 +47,20 @@ export default function PincodeCheck() {
             data-testid="pincode-input"
           />
         </div>
-        <button type="submit" className="h-11 border border-ink px-5 text-sm hover:bg-ink hover:text-white">
+        <button type="submit" className="h-11 border border-ink px-5 text-sm hover:bg-ink hover:text-white" disabled={pending}>
           {t.product.check}
         </button>
       </form>
       <div aria-live="polite" className="mt-2 text-sm" data-testid="pincode-result">
-        {state === "ok" && (
+        {pending && <p className="text-muted">{t.product.checking}</p>}
+        {!pending && result === "bad" && <p className="text-danger">{t.product.pincodeInvalid}</p>}
+        {!pending && result && result !== "bad" && !result.serviceable && <p className="text-danger">{t.product.notServiceable}</p>}
+        {!pending && result && result !== "bad" && result.serviceable && (
           <>
-            <p className="text-saving">{t.product.pincodeResult}</p>
-            <p className="text-xs text-muted">{t.product.pincodeNote}</p>
+            <p className="text-saving">{result.date ? format(t.product.deliveryBy, { date: shortDate(result.date, locale) }) : t.product.pincodeResult}</p>
+            {result.checked && <p className="text-xs text-muted">{result.cod ? t.product.codAvailable : t.product.codUnavailable}</p>}
           </>
         )}
-        {state === "bad" && <p className="text-danger">{t.product.pincodeInvalid}</p>}
       </div>
     </div>
   )
