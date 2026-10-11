@@ -42,6 +42,7 @@ yarn dev                                    # http://localhost:8000
 cd backend;    yarn build; yarn typecheck; yarn test:unit; yarn test:integration:http
 cd storefront; yarn typecheck; yarn lint; yarn test; yarn build   # build needs the backend running
 cd storefront; yarn start; yarn test:e2e     # browser tests (desktop + phone); backend seeded, with OTP_TEST_CODE=123456
+                                             # and the fake Razorpay (see "Checkout and payments")
 ```
 
 Browser tests need Chromium once: `npx playwright install chromium`.
@@ -53,6 +54,8 @@ The backend tests create and drop their own database. They read `DB_HOST`, `DB_U
 | What | Where |
 |---|---|
 | Brand name, policies shown on the site | `storefront/src/config/brand.ts` |
+| Delivery charge, free-delivery amount, COD limit | `backend/src/config/shop.ts` |
+| Seller details on GST invoices | `backend/src/config/seller.ts` |
 | Brand colours | `storefront/tailwind.config.js` (`brand`, `accent`, …) |
 | Shop texts in mr / hi / en | `storefront/src/lib/i18n/dictionaries/` |
 | Colour names and swatches | `storefront/src/lib/i18n/colours.ts` |
@@ -76,8 +79,26 @@ code 123456 (tests use this; it is ignored in production). Real SMS: Message Cen
 (no DLT paperwork; `SMS_PROVIDER=messagecentral`) or your own DLT registration + MSG91
 (`SMS_PROVIDER=msg91`). Steps for both: `docs/SETUP-SMS.md`.
 
+## Checkout and payments
+
+Customers log in (phone code), choose a saved address or add one, and pay online with Razorpay
+or by cash on delivery (orders up to ₹5,000, confirmed by SMS code). Delivery is ₹79, free from ₹999.
+After the order they can download a GST invoice (PDF). Shop rules: `backend/src/config/shop.ts`;
+seller details for invoices: `backend/src/config/seller.ts` (placeholders). Setup steps for
+Razorpay, the webhook and GST: `docs/SETUP-PAYMENTS.md`.
+
+To try online payment without Razorpay keys, run the fake Razorpay and start the backend with test keys:
+
+```
+cd backend
+node integration-tests/fake-razorpay.js     # http://127.0.0.1:9911
+# in backend/.env: RAZORPAY_KEY_ID=rzp_test_fake  RAZORPAY_KEY_SECRET=fake-secret  RAZORPAY_API_BASE=http://127.0.0.1:9911
+```
+
+(The real Razorpay payment window will not open with these keys; the browser tests replace it.)
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.
-In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET`, `OTP_SECRET` and `REDIS_URL`,
-or with the console SMS provider.
+In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET`, `OTP_SECRET`, `REDIS_URL`
+and the three `RAZORPAY_*` values, or with the console SMS provider or a test-only API address.

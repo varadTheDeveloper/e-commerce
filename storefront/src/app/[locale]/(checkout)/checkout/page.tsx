@@ -1,30 +1,33 @@
 import { retrieveCart } from "@lib/data/cart"
+import { listProductsFor } from "@lib/data/catalog"
+import { getShopSettings } from "@lib/data/checkout"
 import { retrieveCustomer } from "@lib/data/customer"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
-import CheckoutForm from "@modules/checkout/templates/checkout-form"
-import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
+import { getDictionary } from "@lib/i18n"
+import { toLocale } from "@lib/i18n/config"
+import { lineDetails } from "@lib/util/line-details"
+import { CHECKOUT_CART_FIELDS } from "@lib/util/checkout"
+import CheckoutView from "@modules/checkout/checkout-view"
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { redirect } from "next/navigation"
 
-export const metadata: Metadata = {
-  title: "Checkout",
+type Props = { params: Promise<{ locale: string }> }
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const t = getDictionary((await props.params).locale)
+  return { title: t.checkout.title, robots: { index: false } }
 }
 
-export default async function Checkout() {
-  const cart = await retrieveCart()
+export default async function Checkout(props: Props) {
+  const locale = toLocale((await props.params).locale)
+  const [cart, customer, settings, products] = await Promise.all([
+    retrieveCart(undefined, CHECKOUT_CART_FIELDS).catch(() => null),
+    retrieveCustomer().catch(() => null),
+    getShopSettings().catch(() => null),
+    listProductsFor(locale).catch(() => []),
+  ])
+  if (!cart?.items?.length) redirect(`/${locale}/cart`)
 
-  if (!cart) {
-    return notFound()
-  }
+  const details = lineDetails(cart.items, products)
 
-  const customer = await retrieveCustomer()
-
-  return (
-    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
-      <PaymentWrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
-      </PaymentWrapper>
-      <CheckoutSummary cart={cart} />
-    </div>
-  )
+  return <CheckoutView cart={cart} customer={customer} settings={settings} details={details} />
 }

@@ -1,0 +1,136 @@
+import { format } from "@lib/i18n"
+import { Dictionary } from "@lib/i18n/dictionaries/en"
+import { colourName } from "@lib/i18n/colours"
+import { Locale } from "@lib/i18n/config"
+import { formatMobile } from "@lib/india"
+import { COD_PROVIDER_ID } from "@lib/util/checkout"
+import { formatINR } from "@lib/util/money"
+import { HttpTypes } from "@medusajs/types"
+import { LineDetails } from "@modules/bag/bag-view"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Image from "next/image"
+
+/** An order in the shop's design: after placing it, and under My orders. */
+export default function OrderView({
+  order,
+  details,
+  locale,
+  t,
+  placed,
+}: {
+  order: HttpTypes.StoreOrder
+  details: Record<string, LineDetails>
+  locale: Locale
+  t: Dictionary
+  /** Just placed: show the thank-you heading */
+  placed?: boolean
+}) {
+  const o = t.order
+  const providers = (order.payment_collections ?? []).flatMap((c) => (c.payments ?? []).map((p) => p.provider_id))
+  const isCod = providers.includes(COD_PROVIDER_ID)
+  const a = order.shipping_address
+  const date = new Date(order.created_at).toLocaleDateString(locale === "en" ? "en-IN" : `${locale}-IN`, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+  const status = o.statuses[order.status as keyof typeof o.statuses] ?? order.status
+  const items = [...(order.items ?? [])].sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)))
+
+  return (
+    <div className="content-container max-w-3xl py-8 small:py-12" data-testid="order-view">
+      {placed ? (
+        <div className="mb-8 border border-line bg-white p-6 text-center" data-testid="order-placed">
+          <p className="mx-auto mb-3 flex h-12 w-12 items-center justify-center bg-ink text-xl text-white" aria-hidden>
+            ✓
+          </p>
+          <h1 className="heading-lg">{o.thanks}</h1>
+          <p className="mt-2 text-muted">{o.note}</p>
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          {placed ? (
+            <h2 className="font-heading text-2xl" data-testid="order-number">{format(o.number, { number: order.display_id ?? "" })}</h2>
+          ) : (
+            <h1 className="heading-lg" data-testid="order-number">{format(o.number, { number: order.display_id ?? "" })}</h1>
+          )}
+          <p className="text-sm text-muted">
+            {format(o.placedOn, { date })} · {o.status}: {status}
+          </p>
+        </div>
+        <a href={`/api/invoice/${order.id}`} target="_blank" rel="noopener" className="btn-outline h-10 px-4 text-sm" data-testid="invoice-link">
+          {o.invoice}
+        </a>
+      </div>
+
+      <section className="mt-6 border border-line bg-white p-5">
+        <h2 className="eyebrow mb-4">{o.items}</h2>
+        <ul className="divide-y divide-line">
+          {items.map((item) => {
+            const d = details[item.id] ?? {}
+            const image = d.image ?? item.thumbnail
+            return (
+              <li key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0" data-testid="order-item">
+                <div className="relative aspect-[4/5] w-16 shrink-0 overflow-hidden bg-surface">
+                  {image && <Image src={image} alt="" fill sizes="64px" className="object-cover" />}
+                </div>
+                <div className="min-w-0 flex-1 text-sm">
+                  <p>{d.title ?? item.product_title}</p>
+                  <p className="text-[13px] text-muted">
+                    {[d.size && `${t.bag.size}: ${d.size}`, d.colour && `${t.bag.colour}: ${colourName(d.colour, locale)}`, `× ${item.quantity}`]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                </div>
+                <p className="text-sm">{formatINR(Number(item.total ?? 0))}</p>
+              </li>
+            )
+          })}
+        </ul>
+        <dl className="mt-4 flex flex-col gap-2 border-t border-line pt-4 text-sm">
+          <div className="flex justify-between">
+            <dt>{t.bag.delivery}</dt>
+            <dd>{Number(order.shipping_total) > 0 ? formatINR(Number(order.shipping_total)) : t.checkout.free}</dd>
+          </div>
+          <div className="flex justify-between text-base font-medium">
+            <dt>{t.bag.total}</dt>
+            <dd data-testid="order-total">{formatINR(Number(order.total))}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <div className="mt-4 grid gap-4 small:grid-cols-2">
+        <section className="border border-line bg-white p-5 text-sm">
+          <h2 className="eyebrow mb-3">{o.deliveryAddress}</h2>
+          {a && (
+            <p className="leading-relaxed text-muted">
+              <span className="text-ink">{a.first_name}</span>
+              <br />
+              {[a.address_1, a.address_2].filter(Boolean).join(", ")}
+              <br />
+              {a.city}, {a.province} {a.postal_code}
+              <br />
+              {formatMobile(a.phone)}
+            </p>
+          )}
+        </section>
+        <section className="border border-line bg-white p-5 text-sm" data-testid="order-payment">
+          <h2 className="eyebrow mb-3">{o.payment}</h2>
+          <p>{isCod ? o.cod : o.paidOnline}</p>
+          {isCod && <p className="mt-1 text-muted">{format(o.codDue, { amount: formatINR(Number(order.total)) })}</p>}
+        </section>
+      </div>
+
+      <div className="mt-8 flex flex-wrap gap-3">
+        <LocalizedClientLink href="/account/orders" prefetch={false} className="btn-primary px-8">
+          {o.myOrders}
+        </LocalizedClientLink>
+        <LocalizedClientLink href="/store" className="btn-outline px-8">
+          {o.continueShopping}
+        </LocalizedClientLink>
+      </div>
+    </div>
+  )
+}

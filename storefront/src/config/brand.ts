@@ -7,8 +7,9 @@
  */
 export const BRAND = {
   name: "Vastra",
-  /** Free delivery above this cart value in rupees, or null if not offered */
-  freeDeliveryAbove: null as number | null,
+  /** Free delivery from this items total in rupees, or null if not offered.
+   *  Must match SHOP.freeShippingFrom in backend/src/config/shop.ts (a test checks it). */
+  freeDeliveryFrom: 999 as number | null,
   returnDays: 7,
   cashOnDelivery: true,
   sourceCodeUrl: "https://github.com/varadTheDeveloper/e-commerce",
