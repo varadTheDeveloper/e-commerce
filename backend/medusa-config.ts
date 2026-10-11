@@ -48,6 +48,30 @@ if (isProduction) {
   }
 }
 
+// Delivery (Shiprocket): see docs/SETUP-SHIPPING.md
+if (isProduction) {
+  for (const name of ['SHIPROCKET_EMAIL', 'SHIPROCKET_PASSWORD', 'SHIPROCKET_WEBHOOK_TOKEN'] as const) {
+    if (!process.env[name]) {
+      throw new Error(`${name} must be set in production`)
+    }
+  }
+  if (process.env.SHIPROCKET_API_BASE) {
+    throw new Error('SHIPROCKET_API_BASE is for tests only; leave it empty in production')
+  }
+}
+
+// Order emails (Resend) and update SMS (Message Central): see docs/SETUP-SHIPPING.md
+if (isProduction) {
+  for (const name of ['RESEND_API_KEY', 'EMAIL_FROM', 'STOREFRONT_URL'] as const) {
+    if (!process.env[name]) {
+      throw new Error(`${name} must be set in production`)
+    }
+  }
+  if (process.env.RESEND_API_BASE) {
+    throw new Error('RESEND_API_BASE is for tests only; leave it empty in production')
+  }
+}
+
 // With REDIS_URL set, events, workflows and locks go through Redis
 // (needed when the server and worker run as separate processes).
 // Without it (local development), Medusa uses its in-memory defaults.
@@ -118,6 +142,16 @@ module.exports = defineConfig({
             id: 'phone-otp',
             options: { secret: otpConfig().secret },
           },
+        ],
+      },
+    },
+    {
+      resolve: '@medusajs/medusa/fulfillment',
+      options: {
+        providers: [
+          // Manual stays for returns until Step 6
+          { resolve: '@medusajs/medusa/fulfillment-manual', id: 'manual' },
+          { resolve: './src/modules/shiprocket', id: 'shiprocket' },
         ],
       },
     },

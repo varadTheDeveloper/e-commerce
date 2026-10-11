@@ -2,6 +2,7 @@ import { AuthenticatedMedusaRequest } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { SHOP } from "../../../config/shop"
 import { OtpState } from "../../../lib/otp"
+import { deliveryEstimate } from "../../../lib/shiprocket"
 
 export type CodCart = {
   id: string
@@ -38,6 +39,7 @@ export async function checkCodCart(req: AuthenticatedMedusaRequest, cartId: stri
       "total",
       "items.id",
       "shipping_address.id",
+      "shipping_address.postal_code",
       "shipping_methods.id",
       "payment_collection.id",
     ],
@@ -53,6 +55,11 @@ export async function checkCodCart(req: AuthenticatedMedusaRequest, cartId: stri
   const total = Number(cart.total)
   if (total > SHOP.codMaxOrder) {
     return { ok: false, status: 400, type: "cod_limit", message: `Cash on delivery is available up to ₹${SHOP.codMaxOrder}` }
+  }
+
+  const estimate = await deliveryEstimate(String(cart.shipping_address.postal_code ?? "")).catch(() => null)
+  if (estimate?.checked && !estimate.cod) {
+    return { ok: false, status: 400, type: "cod_unavailable", message: "Cash on delivery is not available for this pincode" }
   }
 
   // The number the customer logged in with

@@ -69,7 +69,11 @@ jobs:
         run: |
           KEY=$(psql "$DATABASE_URL" -tAc "select token from api_key where type='publishable' limit 1")
           echo "NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=$KEY" >> "$GITHUB_ENV"
-      # Online payments go to a fake Razorpay on localhost (test keys only, refused in production)
+      # A throwaway admin user for the browser test that ships an order (CI database only)
+      - name: Create test admin user
+        working-directory: backend
+        run: npx medusa user -e ci-staff@example.com -p ci-only-password-1
+      # Payments and courier bookings go to fakes on localhost (test values only, refused in production)
       - name: Start backend
         working-directory: backend
         env:
@@ -77,8 +81,13 @@ jobs:
           RAZORPAY_KEY_SECRET: fake-secret
           RAZORPAY_WEBHOOK_SECRET: ci-webhook-secret
           RAZORPAY_API_BASE: http://127.0.0.1:9911
+          SHIPROCKET_EMAIL: api@example.com
+          SHIPROCKET_PASSWORD: fake-password
+          SHIPROCKET_WEBHOOK_TOKEN: ci-hook-token
+          SHIPROCKET_API_BASE: http://127.0.0.1:9912
         run: |
           nohup node integration-tests/fake-razorpay.js > ../fake-razorpay.log 2>&1 &
+          nohup node integration-tests/fake-shiprocket.js > ../fake-shiprocket.log 2>&1 &
           nohup yarn dev > ../backend.log 2>&1 &
           for i in $(seq 1 60); do curl -sf http://localhost:9000/health && exit 0; sleep 2; done
           cat ../backend.log; exit 1
@@ -114,6 +123,10 @@ jobs:
           cat ../storefront.log; exit 1
       - name: Browser tests
         working-directory: storefront
+        env:
+          E2E_ADMIN_EMAIL: ci-staff@example.com
+          E2E_ADMIN_PASSWORD: ci-only-password-1
+          E2E_WEBHOOK_TOKEN: ci-hook-token
         run: yarn test:e2e
       - name: Upload test traces
         if: failure()

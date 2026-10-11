@@ -3,9 +3,8 @@ import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { createHmac } from "crypto"
 import { writeFileSync } from "fs"
 import { refundPaymentWorkflow } from "@medusajs/medusa/core-flows"
-import seedDemoData from "../../src/scripts/seed"
 import { SHOP } from "../../src/config/shop"
-import { signUpCustomer } from "./helpers"
+import { shopHelpers, signUpCustomer } from "./helpers"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { startFakeRazorpay, KEY_ID, KEY_SECRET } = require("../fake-razorpay")
 
@@ -34,45 +33,19 @@ beforeAll(async () => {
 })
 afterAll(() => fake.close())
 
-const ADDRESS = {
-  first_name: "आशा",
-  last_name: "पाटील",
-  address_1: "12, Shivaji Nagar",
-  address_2: "Near bus stand",
-  city: "Jalna",
-  province: "Maharashtra",
-  postal_code: "431203",
-  country_code: "in",
-  phone: "9876543210",
-}
-
 medusaIntegrationTestRunner({
   inApp: true,
   env: {},
   testSuite: ({ api, getContainer }) => {
+    const shop = shopHelpers(api, getContainer)
     let store: Record<string, string>
     let regionId: string
     let cheap: { id: string; price: number }
     let expensive: { id: string; price: number }
-    let phoneNo = 9100000000
 
     beforeEach(async () => {
-      const container = getContainer()
-      await seedDemoData({ container, args: [] } as any)
-      const query = container.resolve(ContainerRegistrationKeys.QUERY)
-      const { data: keys } = await query.graph({ entity: "api_key", fields: ["token"], filters: { type: "publishable" } })
-      store = { "x-publishable-api-key": keys[0].token }
-      const { data: regions } = await api.get("/store/regions", { headers: store })
-      regionId = regions.regions[0].id
-
-      const { data } = await api.get(`/store/products?region_id=${regionId}&fields=*variants.calculated_price,%2Bvariants.inventory_quantity&limit=100`, { headers: store })
-      const variants = data.products
-        .flatMap((p: any) => p.variants)
-        .filter((v: any) => v.inventory_quantity > 5)
-        .map((v: any) => ({ id: v.id, price: v.calculated_price.calculated_amount }))
-      cheap = variants.find((v: any) => v.price < SHOP.freeShippingFrom)
-      expensive = variants.find((v: any) => v.price >= SHOP.freeShippingFrom)
-      expect(cheap && expensive).toBeTruthy()
+      await shop.seed()
+      ;({ store, regionId, cheap, expensive } = shop)
     })
 
     /** Makes the customer's SMS login look `minutes` old. */
@@ -92,25 +65,13 @@ medusaIntegrationTestRunner({
 
     /** A logged-in customer's cart with an address and delivery, ready to pay. */
     async function readyCart(variant: { id: string }, quantity = 1, loginMinutesAgo = 0) {
-      const phone = String(++phoneNo)
-      const customer = await signUpCustomer(api, store, phone, "Asha")
-      if (loginMinutesAgo) await ageLogin(phone, loginMinutesAgo)
-      const { data } = await api.post("/store/carts", { region_id: regionId }, { headers: customer })
-      const cartId = data.cart.id
-      await api.post(`/store/carts/${cartId}/line-items`, { variant_id: variant.id, quantity }, { headers: customer })
-      await api.post(`/store/carts/${cartId}`, { shipping_address: ADDRESS, billing_address: ADDRESS }, { headers: customer })
-      const { data: options } = await api.get(`/store/shipping-options?cart_id=${cartId}`, { headers: customer })
-      expect(options.shipping_options).toHaveLength(1)
-      const { data: withShipping } = await api.post(
-        `/store/carts/${cartId}/shipping-methods`,
-        { option_id: options.shipping_options[0].id },
-        { headers: customer }
-      )
-      return { cartId, customer, cart: withShipping.cart }
+      const ready = await shop.readyCart(variant, quantity)
+      if (loginMinutesAgo) await ageLogin(ready.phone, loginMinutesAgo)
+      expect(ready.options).toHaveLength(1)
+      return ready
     }
 
-    const complete = (cartId: string, headers: Record<string, string>) =>
-      api.post(`/store/carts/${cartId}/complete`, {}, { headers }).then((r) => r.data)
+    const complete = shop.complete
 
     async function startRazorpay(cartId: string, headers: Record<string, string>) {
       const { data } = await api.post("/store/payment-collections", { cart_id: cartId }, { headers })
@@ -172,7 +133,7 @@ medusaIntegrationTestRunner({
         const bytes = Buffer.from(pdf.data)
         expect(bytes.subarray(0, 5).toString()).toBe("%PDF-")
         if (process.env.INVOICE_SAMPLE) writeFileSync(process.env.INVOICE_SAMPLE, bytes)
-        const other = await signUpCustomer(api, store, String(++phoneNo), "Ravi")
+        const other = await signUpCustomer(api, store, shop.nextPhone(), "Ravi")
         const refused = await api.get(`/store/orders/${result.order.id}/invoice`, { headers: other }).catch((e) => e.response)
         expect(refused.status).toBe(404)
         const anonymous = await api.get(`/store/orders/${result.order.id}/invoice`, { headers: store }).catch((e) => e.response)
@@ -201,7 +162,7 @@ medusaIntegrationTestRunner({
 
       it("only works on the customer's own cart", async () => {
         const { cartId } = await readyCart(cheap)
-        const other = await signUpCustomer(api, store, String(++phoneNo), "Ravi")
+        const other = await signUpCustomer(api, store, shop.nextPhone(), "Ravi")
         const res = await api.post("/store/cod/request", { cart_id: cartId }, { headers: other }).catch((e) => e.response)
         expect(res.status).toBe(404)
       })
