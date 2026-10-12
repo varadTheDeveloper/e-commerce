@@ -259,3 +259,23 @@ export const updateCustomerAddress = async (
       return { success: false, error: err.toString() }
     })
 }
+
+/**
+ * "Delete my account": the backend removes personal details (orders are
+ * kept for tax records), then the customer is logged out.
+ */
+export async function deleteMyAccount(locale: string): Promise<{ ok: false; error: "open_orders" | "failed" }> {
+  const headers = { ...(await getAuthHeaders()) }
+  try {
+    await sdk.client.fetch("/store/customers/me/delete", { method: "POST", headers })
+  } catch (e) {
+    const err = e as { status?: number }
+    return { ok: false, error: err.status === 409 ? "open_orders" : "failed" }
+  }
+  await sdk.auth.logout().catch(() => {})
+  await removeAuthToken()
+  revalidateTag(await getCacheTag("customers"))
+  await removeCartId()
+  revalidateTag(await getCacheTag("carts"))
+  redirect(`/${locale}`)
+}

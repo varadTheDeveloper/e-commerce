@@ -28,6 +28,7 @@ export async function logIn(page: Page, name = "Asha") {
   await page.getByTestId("send-code-button").click()
   await page.getByTestId("code-input").fill("123456")
   await page.getByTestId("first-name-input").fill(name)
+  await page.getByTestId("consent-checkbox").check()
   await page.getByTestId("create-account-button").click()
 }
 

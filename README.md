@@ -114,6 +114,13 @@ admin panel (**Returns**); approving books a free courier pickup. Online payment
 the item comes back; cash-on-delivery refunds are sent by staff to the customer's UPI ID or bank account. How staff
 handle orders, cancellations and returns: `docs/STAFF-GUIDE.md`.
 
+## Legal pages and privacy
+
+About, contact, shipping, returns, privacy, terms, grievance officer and FAQ pages in mr/hi/en. The seller details
+in `storefront/src/config/seller.ts` are placeholders, and the pages show a "draft" notice until a lawyer has checked
+them. Customers agree to the privacy policy when they sign up, and can delete their account from their profile
+(orders are kept for tax records).
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.

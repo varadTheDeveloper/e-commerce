@@ -3,6 +3,7 @@
 import { AuthError, completeSignup, requestLoginCode, verifyLoginCode } from "@lib/data/phone-auth"
 import { format } from "@lib/i18n"
 import { useI18n } from "@lib/i18n/provider"
+import { richFormat } from "@modules/common/components/rich-format"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, useTransition } from "react"
 
@@ -15,7 +16,13 @@ const input =
 
 /** Mobile number → SMS code → (first time) name. */
 export default function PhoneLogin() {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  // Opens in a new tab, so the login in progress is not lost
+  const policyLink = (slug: "privacy" | "terms", label: string) => (
+    <a href={`/${locale}/${slug}`} target="_blank" rel="noopener" className="underline underline-offset-2">
+      {label}
+    </a>
+  )
   const router = useRouter()
   const [step, setStep] = useState<Step>("phone")
   const [phone, setPhone] = useState("")
@@ -81,6 +88,7 @@ export default function PhoneLogin() {
         firstName: String(form.get("first_name") ?? ""),
         lastName: String(form.get("last_name") ?? ""),
         email: String(form.get("email") ?? ""),
+        consent: form.get("privacy_consent") === "on",
       })
       if (!res.ok) {
         setError(res.error)
@@ -127,6 +135,9 @@ export default function PhoneLogin() {
           <button type="submit" className="btn-primary w-full" disabled={pending} data-testid="send-code-button">
             {pending ? t.auth.sending : t.auth.sendCode}
           </button>
+          <p className="text-[13px] leading-relaxed text-muted" data-testid="phone-notice">
+            {richFormat(t.auth.phoneNotice, { privacy: policyLink("privacy", t.auth.privacyLink) })}
+          </p>
         </form>
       )}
 
@@ -185,7 +196,14 @@ export default function PhoneLogin() {
       )}
 
       {step === "name" && (
-        <form action={finish} className="flex flex-col gap-4">
+        <form
+          onSubmit={(e) => {
+            // Not a form action: React would empty the fields, and the name is lost if the box was not ticked
+            e.preventDefault()
+            finish(new FormData(e.currentTarget))
+          }}
+          className="flex flex-col gap-4"
+        >
           <div>
             <h1 className="heading-lg">{t.auth.nameTitle}</h1>
             <p className="mt-2 text-sm text-muted">{t.auth.nameSubtitle}</p>
@@ -201,6 +219,15 @@ export default function PhoneLogin() {
           <label className="flex flex-col gap-1.5 text-sm">
             {t.auth.emailOptional}
             <input className={input} name="email" type="email" maxLength={120} autoComplete="email" />
+          </label>
+          <label className="flex items-start gap-3 text-sm leading-relaxed">
+            <input type="checkbox" name="privacy_consent" className="mt-1 h-4 w-4 shrink-0 accent-ink" data-testid="consent-checkbox" />
+            <span>
+              {richFormat(t.auth.consent, {
+                privacy: policyLink("privacy", t.auth.privacyLink),
+                terms: policyLink("terms", t.auth.termsLink),
+              })}
+            </span>
           </label>
           <button type="submit" className="btn-primary w-full" disabled={pending} data-testid="create-account-button">
             {pending ? t.auth.creating : t.auth.createAccount}

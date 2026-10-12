@@ -1,5 +1,6 @@
 import { Dictionary } from "@lib/i18n"
 import { HttpTypes } from "@medusajs/types"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { ChevronDownIcon } from "@modules/common/icons/ui"
 
 function Section({ title, open, children }: { title: string; open?: boolean; children: React.ReactNode }) {
@@ -48,6 +49,9 @@ export default function ProductDetails({ product, t }: { product: HttpTypes.Stor
       )}
       <Section title={t.product.returns}>
         <p>{t.product.returnsText}</p>
+        <LocalizedClientLink href="/returns-policy" className="mt-2 inline-block text-ink underline underline-offset-4" data-testid="returns-policy-link">
+          {t.product.returnsPolicy}
+        </LocalizedClientLink>
       </Section>
     </div>
   )

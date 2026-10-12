@@ -10,6 +10,8 @@ export const OtpAccountSchema = z.object({
   first_name: z.string().trim().min(1).max(60),
   last_name: z.string().trim().max(60).optional(),
   email: z.string().trim().email().max(120).optional().or(z.literal("")),
+  /** Ticked "I am 18 or older and agree to the privacy policy and terms" */
+  privacy_consent: z.literal(true, { message: "Please agree to the privacy policy." }),
 })
 
 export const AddToWishlistSchema = z.object({
@@ -56,6 +58,11 @@ const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize
 
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/store/customers/me/delete",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
     {
       matcher: "/store/customers/me/wishlist*",
       middlewares: [authenticate("customer", ["session", "bearer"])],

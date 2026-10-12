@@ -16,6 +16,7 @@ async function signUp(page: Page, name = "Asha") {
   await page.getByTestId("send-code-button").click()
   await page.getByTestId("code-input").fill("123456")
   await page.getByTestId("first-name-input").fill(name)
+  await page.getByTestId("consent-checkbox").check()
   await page.getByTestId("create-account-button").click()
   await expect(page.getByTestId("account-hello")).toHaveText(`Hello, ${name}`)
 }
@@ -33,6 +34,11 @@ test("login: wrong code is refused, right code signs up, logout works", async ({
 
   await page.getByTestId("code-input").fill("123456")
   await page.getByTestId("first-name-input").fill("Ravi")
+  // Must agree to the privacy policy and terms first
+  await page.getByTestId("create-account-button").click()
+  await expect(page.getByTestId("login-error")).toContainText("tick the box")
+  await expect(page.getByTestId("login-page").getByRole("link", { name: "Privacy policy" })).toHaveAttribute("href", "/en/privacy")
+  await page.getByTestId("consent-checkbox").check()
   await page.getByTestId("create-account-button").click()
   await expect(page.getByTestId("account-hello")).toHaveText("Hello, Ravi")
 

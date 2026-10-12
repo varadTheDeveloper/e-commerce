@@ -10,6 +10,7 @@ import { transferCart } from "./customer"
 
 export type AuthError =
   | "invalid_phone"
+  | "consent_required"
   | "too_soon"
   | "too_many"
   | "sms_failed"
@@ -85,9 +86,12 @@ export async function completeSignup(data: {
   firstName: string
   lastName?: string
   email?: string
+  /** Ticked "18 or older, agree to the privacy policy and terms" */
+  consent: boolean
 }): Promise<{ ok: true } | Fail> {
   const firstName = data.firstName.trim()
   if (!firstName || firstName.length > 60) return { ok: false, error: "invalid_name" }
+  if (!data.consent) return { ok: false, error: "consent_required" }
   try {
     const headers = await getAuthHeaders()
     await sdk.client.fetch("/store/otp/account", {
@@ -95,6 +99,7 @@ export async function completeSignup(data: {
       headers,
       body: {
         first_name: firstName,
+        privacy_consent: true,
         ...(data.lastName?.trim() ? { last_name: data.lastName.trim() } : {}),
         ...(data.email?.trim() ? { email: data.email.trim() } : {}),
       },

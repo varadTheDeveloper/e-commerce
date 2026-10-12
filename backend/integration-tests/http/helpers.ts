@@ -13,7 +13,7 @@ export async function publishableHeaders(getContainer: () => any) {
 export async function signUpCustomer(api: any, headers: Record<string, string>, phone: string, firstName = "Test") {
   await api.post("/store/otp/request", { phone }, { headers })
   const { data } = await api.post("/auth/customer/phone-otp", { phone, code: "123456" })
-  await api.post("/store/otp/account", { first_name: firstName }, { headers: { ...headers, authorization: `Bearer ${data.token}` } })
+  await api.post("/store/otp/account", { first_name: firstName, privacy_consent: true }, { headers: { ...headers, authorization: `Bearer ${data.token}` } })
   const refreshed = await api.post("/auth/token/refresh", {}, { headers: { authorization: `Bearer ${data.token}` } })
   return { ...headers, authorization: `Bearer ${refreshed.data.token}` }
 }
