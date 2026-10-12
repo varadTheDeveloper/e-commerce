@@ -2,7 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { getAuthHeaders, getCacheTag } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
 
@@ -113,7 +113,7 @@ export async function cancelOrder(orderId: string, reason: CancelReason): Promis
       body: { reason },
       headers: await getAuthHeaders(),
     })
-    revalidateTag(await getCacheTag("orders"))
+    updateTag(await getCacheTag("orders"))
     return { ok: true }
   } catch {
     return { ok: false }

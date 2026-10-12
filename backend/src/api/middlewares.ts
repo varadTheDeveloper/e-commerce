@@ -1,7 +1,8 @@
-import { authenticate, defineMiddlewares, validateAndTransformBody } from "@medusajs/framework/http"
+import { authenticate, defineMiddlewares, MedusaNextFunction, MedusaRequest, MedusaResponse, validateAndTransformBody } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
 import multer from "multer"
 import { CANCEL_REASONS } from "../lib/cancel"
+import { RateLimiter } from "../lib/rate-limit"
 import { RETURN_REASONS } from "../lib/returns"
 
 export const OtpRequestSchema = z.object({ phone: z.string().min(10).max(20) })
@@ -56,8 +57,30 @@ export const CreateReturnSchema = z.object({
 // Return photos: one per request, kept in memory, at most 5 MB
 const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } })
 
+// Staff login: after 10 wrong passwords for one email from one address in 15 minutes,
+// wait. Only failures count, so staff who type the right password are never slowed.
+const staffLoginFailures = new RateLimiter(10, 15 * 60 * 1000)
+function limitStaffLogin(req: MedusaRequest, res: MedusaResponse, next: MedusaNextFunction) {
+  const email = String((req.body as { email?: unknown } | undefined)?.email ?? "").toLowerCase()
+  const key = `${req.ip ?? "unknown"}|${email}`
+  const wait = staffLoginFailures.check(key)
+  if (wait) {
+    res.status(429).json({ type: "too_many", message: "Too many wrong passwords. Please try again later.", retry_after: Math.ceil(wait / 1000) })
+    return
+  }
+  res.on("finish", () => {
+    if (res.statusCode === 401) staffLoginFailures.hit(key)
+  })
+  next()
+}
+
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/auth/user/emailpass",
+      method: ["POST"],
+      middlewares: [limitStaffLogin],
+    },
     {
       matcher: "/store/customers/me/delete",
       method: ["POST"],

@@ -76,8 +76,12 @@ export function WishlistProvider({
 }) {
   const local = useSyncExternalStore(subscribe, snapshot, () => EMPTY)
   const [account, setAccount] = useState<string[]>(initial ?? [])
-
-  useEffect(() => setAccount(initial ?? []), [initial])
+  // New list from the server (after login or a refresh): take it, while rendering
+  const [lastInitial, setLastInitial] = useState(initial)
+  if (initial !== lastInitial) {
+    setLastInitial(initial)
+    setAccount(initial ?? [])
+  }
 
   // First visit after login: move the browser wishlist into the account
   useEffect(() => {

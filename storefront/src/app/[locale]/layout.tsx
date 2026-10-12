@@ -8,10 +8,14 @@ import { Mukta, Tiro_Devanagari_Marathi } from "next/font/google"
 import "styles/globals.css"
 
 // Mukta covers Devanagari (Marathi, Hindi) and Latin in one family.
+// Not preloaded: with preloading, phones fetched all 10 font files (~415 KB) before
+// anything else. Without it the browser fetches only the weights and scripts a page
+// uses (English pages skip the Devanagari files), showing text in a fallback meanwhile.
 const mukta = Mukta({
   subsets: ["devanagari", "latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
+  preload: false,
   variable: "--font-sans",
 })
 
@@ -20,6 +24,7 @@ const tiro = Tiro_Devanagari_Marathi({
   subsets: ["devanagari", "latin"],
   weight: "400",
   display: "swap",
+  preload: false,
   variable: "--font-heading",
 })
 

@@ -3,7 +3,7 @@
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import {
   getAuthHeaders,
@@ -54,7 +54,7 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
     .catch(medusaError)
 
   const cacheTag = await getCacheTag("customers")
-  revalidateTag(cacheTag)
+  updateTag(cacheTag)
 
   return updateRes
 }
@@ -94,7 +94,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
     await setAuthToken(loginToken as string)
 
     const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
+    updateTag(customerCacheTag)
 
     await transferCart()
 
@@ -114,7 +114,7 @@ export async function login(_currentState: unknown, formData: FormData) {
       .then(async (token) => {
         await setAuthToken(token as string)
         const customerCacheTag = await getCacheTag("customers")
-        revalidateTag(customerCacheTag)
+        updateTag(customerCacheTag)
       })
   } catch (error: any) {
     return error.toString()
@@ -133,12 +133,12 @@ export async function signout(locale: string) {
   await removeAuthToken()
 
   const customerCacheTag = await getCacheTag("customers")
-  revalidateTag(customerCacheTag)
+  updateTag(customerCacheTag)
 
   await removeCartId()
 
   const cartCacheTag = await getCacheTag("carts")
-  revalidateTag(cartCacheTag)
+  updateTag(cartCacheTag)
 
   redirect(`/${locale}/account`)
 }
@@ -155,7 +155,7 @@ export async function transferCart() {
   await sdk.store.cart.transferCart(cartId, {}, headers)
 
   const cartCacheTag = await getCacheTag("carts")
-  revalidateTag(cartCacheTag)
+  updateTag(cartCacheTag)
 }
 
 export const addCustomerAddress = async (
@@ -188,7 +188,7 @@ export const addCustomerAddress = async (
     .createAddress(address, {}, headers)
     .then(async ({ customer }) => {
       const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
+      updateTag(customerCacheTag)
       return { success: true, error: null }
     })
     .catch((err) => {
@@ -207,7 +207,7 @@ export const deleteCustomerAddress = async (
     .deleteAddress(addressId, headers)
     .then(async () => {
       const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
+      updateTag(customerCacheTag)
       return { success: true, error: null }
     })
     .catch((err) => {
@@ -252,7 +252,7 @@ export const updateCustomerAddress = async (
     .updateAddress(addressId, address, {}, headers)
     .then(async () => {
       const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
+      updateTag(customerCacheTag)
       return { success: true, error: null }
     })
     .catch((err) => {
@@ -264,7 +264,7 @@ export const updateCustomerAddress = async (
  * "Delete my account": the backend removes personal details (orders are
  * kept for tax records), then the customer is logged out.
  */
-export async function deleteMyAccount(locale: string): Promise<{ ok: false; error: "open_orders" | "failed" }> {
+export async function deleteMyAccount(): Promise<{ ok: true } | { ok: false; error: "open_orders" | "failed" }> {
   const headers = { ...(await getAuthHeaders()) }
   try {
     await sdk.client.fetch("/store/customers/me/delete", { method: "POST", headers })
@@ -274,8 +274,9 @@ export async function deleteMyAccount(locale: string): Promise<{ ok: false; erro
   }
   await sdk.auth.logout().catch(() => {})
   await removeAuthToken()
-  revalidateTag(await getCacheTag("customers"))
+  updateTag(await getCacheTag("customers"))
   await removeCartId()
-  revalidateTag(await getCacheTag("carts"))
-  redirect(`/${locale}`)
+  updateTag(await getCacheTag("carts"))
+  // The page then reloads the home page (clears everything the browser held for this account)
+  return { ok: true }
 }

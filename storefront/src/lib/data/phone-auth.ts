@@ -1,7 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { getAuthHeaders, getCacheTag, setAuthToken } from "./cookies"
 import { transferCart } from "./customer"
 
@@ -44,7 +44,7 @@ function decodeToken(token: string): { actor_id?: string } {
 }
 
 async function afterLogin() {
-  revalidateTag(await getCacheTag("customers"))
+  updateTag(await getCacheTag("customers"))
   try {
     await transferCart()
   } catch {

@@ -17,7 +17,7 @@ Copying open-source code is fine (MIT, BSD, GPL); record every copy in `CREDITS.
 ## Stack (decided)
 ```
 backend/      Medusa v2 (2.21.x), Postgres 16, Redis 7     from medusa-starter-default (MIT)
-storefront/   Next.js 15 + Tailwind                         from nextjs-starter-medusa (MIT)
+storefront/   Next.js 16 + Tailwind                         from nextjs-starter-medusa (MIT)
 ```
 Search: in-memory over the catalogue (`storefront/src/lib/util/search.ts`); move to Medusa's search module or Meilisearch if the catalogue grows past a few thousand products. Payments: Razorpay + COD. Shipping: Shiprocket. Hosting: AWS.
 Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
@@ -33,12 +33,13 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
 6. (done) Returns + size exchange: 7 days after delivery, free pickup (Shiprocket), photos for damaged/wrong items, COD refunds by staff to UPI/bank, online refunds through Razorpay, staff page in the admin, staff guide `docs/STAFF-GUIDE.md`.
 7. Quality, in 3 PRs:
    7a. (done) Legal/help pages (mr/hi/en, placeholder seller details, "draft" notice), consent at sign-up, delete my account.
-   7b. Phone speed check, accessibility (axe), security review, one full "golden path" browser test.
+   7b. (done) Phone speed check, accessibility (axe + keyboard), security review, "golden path" browser test.
+       Results and what is left: `docs/QUALITY.md`.
    7c. Staging on AWS (EC2 + Docker; RDS still to be decided by the owner).
 Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer profiles, segments, tickets), dashboards.
 
 ## How the shop works (storefront)
-- URLs: `/[locale]/...` with locale `mr` (default) | `hi` | `en`. `src/middleware.ts` redirects and keeps `_medusa_locale` in step.
+- URLs: `/[locale]/...` with locale `mr` (default) | `hi` | `en`. `src/proxy.ts` (Next.js 16 name for middleware) redirects and keeps `_medusa_locale` in step.
   `[locale]/layout.tsx` is the root layout (sets `<html lang>`). Region is always India (`NEXT_PUBLIC_DEFAULT_REGION=in`).
 - UI strings: `src/lib/i18n/dictionaries/{en,hi,mr}.ts` (en defines the type). Server: `getDictionary(locale)`; client: `useI18n()`.
 - Catalogue reads: `src/lib/data/catalog.ts`, always passing the locale explicitly (sends `x-medusa-locale`), so pre-built pages are right.
@@ -95,6 +96,14 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
   `customer.metadata.privacy_consent` {version (`backend/src/config/privacy.ts`, change it when the policy changes), at}.
   "Delete my account": `POST /store/customers/me/delete` (`src/lib/delete-account.ts`): refused while an order is
   undelivered or a return open; removes name, phone, email, addresses, wishlist and the login; orders stay (GST records).
+- Next.js 16 (moved from 15 in Step 7b: 15.3 had a critical security hole and 15.5 left buttons stuck after server
+  actions). Server actions refresh data with `updateTag` (not `revalidateTag`); don't add `router.refresh()` after an
+  action that already updates a tag. Lint is ESLint 9 (`eslint.config.mjs`, `yarn lint` = `eslint src`).
+- Quality guards (browser tests): `e2e/speed.spec.ts` (no font preloading; script/font budget),
+  `e2e/a11y.spec.ts` (axe WCAG 2.1 AA on the main pages + keyboard-only purchase), `e2e/golden-path.spec.ts`.
+  Fonts are not preloaded on purpose (`[locale]/layout.tsx`); keep it that way.
+- Security: website headers in `storefront/next.config.js`; staff login limited after 10 wrong passwords
+  (`backend/src/api/middlewares.ts`); return photo uploads limited to 20 per customer per hour.
 - Tests use fakes: `backend/integration-tests/fake-razorpay.js`, `fake-shiprocket.js` (both also run by CI for the
   browser tests; Playwright replaces Razorpay's checkout.js with a stand-in) and `fake-messaging.js` (Resend +
   Message Central, backend tests only). The "shipped by staff" browser test needs E2E_ADMIN_EMAIL/PASSWORD and
@@ -116,7 +125,10 @@ server would pick up the tests' delayed jobs (the Razorpay webhook test then fai
   (credited on /credits, hotlinked from images.unsplash.com); replace with the brand's photos before launch.
 - Real SMS: the client is signing up with Message Central (docs/SETUP-SMS.md, option A); until the keys are on the
   server, login works only in test mode. Message Central is tested only against a fake of their API, not the live service.
-- Rate limits for code requests are in memory (one server); move to Redis if scaled out.
+- Rate limits (codes, staff login, photo uploads, pincode checks) are in memory (one server); move to Redis if
+  scaled out. They key on `req.ip`: behind a proxy, Express must trust it (Step 7c).
+- No full Content-Security-Policy for scripts yet (Next.js inline scripts, Razorpay). Build/test tools still have
+  audit advisories (not on the live servers); see docs/QUALITY.md.
 - Shiprocket, Resend and MessageNow SMS are tested only against fakes built from their docs, not the live services.
   Shiprocket's webhook body format is assumed (`awb`, `current_status`, `order_id`); unknown statuses are logged.
 - Order-update SMS need DLT templates (docs/SETUP-SHIPPING.md); off until then. Emails need a verified Resend domain.
