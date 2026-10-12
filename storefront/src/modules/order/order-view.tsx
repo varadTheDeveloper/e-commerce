@@ -11,6 +11,8 @@ import { LineDetails } from "@modules/bag/bag-view"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 import CancelOrder from "./cancel-order"
+import ReturnsSection from "./returns-section"
+import { ReturnInfo } from "@lib/data/returns"
 
 type Step = "placed" | "packed" | "shipped" | "out_for_delivery" | "delivered"
 /** Which delivery steps the order has reached, and when. */
@@ -46,6 +48,8 @@ export default function OrderView({
   t,
   placed,
   tracking,
+  returns,
+  returnSent,
 }: {
   order: HttpTypes.StoreOrder
   tracking: OrderTracking
@@ -54,6 +58,9 @@ export default function OrderView({
   t: Dictionary
   /** Just placed: show the thank-you heading */
   placed?: boolean
+  /** Return/exchange info (order details page only) */
+  returns?: ReturnInfo | null
+  returnSent?: boolean
 }) {
   const o = t.order
   const providers = (order.payment_collections ?? []).flatMap((c) => (c.payments ?? []).map((p) => p.provider_id))
@@ -175,6 +182,8 @@ export default function OrderView({
           </div>
         </dl>
       </section>
+
+      {returns !== undefined && <ReturnsSection orderId={order.id} info={returns} sent={returnSent} locale={locale} t={t} />}
 
       <div className="mt-4 grid gap-4 small:grid-cols-2">
         <section className="border border-line bg-white p-5 text-sm">
