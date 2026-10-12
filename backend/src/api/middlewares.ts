@@ -1,5 +1,6 @@
 import { authenticate, defineMiddlewares, validateAndTransformBody } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import { CANCEL_REASONS } from "../lib/cancel"
 
 export const OtpRequestSchema = z.object({ phone: z.string().min(10).max(20) })
 
@@ -16,6 +17,10 @@ export const AddToWishlistSchema = z.object({
 export const CodRequestSchema = z.object({ cart_id: z.string().min(1).max(100) })
 export const CodConfirmSchema = z.object({ cart_id: z.string().min(1).max(100), code: z.string().regex(/^\d{6}$/).optional() })
 
+export const CancelOrderSchema = z.object({
+  reason: z.enum(CANCEL_REASONS),
+})
+
 export default defineMiddlewares({
   routes: [
     {
@@ -28,9 +33,19 @@ export default defineMiddlewares({
       middlewares: [validateAndTransformBody(AddToWishlistSchema)],
     },
     {
+      matcher: "/store/orders/:id/tracking",
+      method: ["GET"],
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
       matcher: "/store/orders/:id/invoice",
       method: ["GET"],
       middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
+      matcher: "/store/orders/:id/cancel",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["session", "bearer"]), validateAndTransformBody(CancelOrderSchema)],
     },
     {
       matcher: "/store/cod*",

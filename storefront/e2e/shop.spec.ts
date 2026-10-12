@@ -93,9 +93,17 @@ test("product: size chart and pincode", async ({ page }) => {
   await page.getByTestId("pincode-input").fill("12345")
   await page.getByRole("button", { name: "Check" }).click()
   await expect(page.getByTestId("pincode-result")).toContainText("valid 6-digit")
+  // Answers come from the courier check (the fake Shiprocket in tests: 9… not served, 8… no COD)
   await page.getByTestId("pincode-input").fill("431203")
   await page.getByRole("button", { name: "Check" }).click()
-  await expect(page.getByTestId("pincode-result")).toContainText("Delivery in")
+  await expect(page.getByTestId("pincode-result")).toContainText("Delivery by")
+  await expect(page.getByTestId("pincode-result")).toContainText("Cash on delivery available")
+  await page.getByTestId("pincode-input").fill("800001")
+  await page.getByRole("button", { name: "Check" }).click()
+  await expect(page.getByTestId("pincode-result")).toContainText("not available here")
+  await page.getByTestId("pincode-input").fill("900001")
+  await page.getByRole("button", { name: "Check" }).click()
+  await expect(page.getByTestId("pincode-result")).toContainText("do not deliver")
 })
 
 test("wishlist: save from a product card and see it on the wishlist page", async ({ page }) => {

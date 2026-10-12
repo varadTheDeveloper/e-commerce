@@ -15,6 +15,8 @@ import { colourName } from "@lib/i18n/colours"
 import { useI18n } from "@lib/i18n/provider"
 import { formatMobile } from "@lib/india"
 import { formatINR } from "@lib/util/money"
+import { DeliveryEstimate } from "@lib/data/delivery"
+import { shortDate } from "@lib/util/dates"
 import { HttpTypes } from "@medusajs/types"
 import PhoneLogin from "@modules/account/components/phone-login"
 import { AddressForm, toInput } from "@modules/account/components/address-book"
@@ -30,6 +32,8 @@ type Props = {
   customer: HttpTypes.StoreCustomer | null
   settings: ShopSettings | null
   details: Record<string, LineDetails>
+  /** Courier check for the chosen address (null when not known) */
+  estimate: DeliveryEstimate | null
 }
 
 const AUTH_ERRORS = ["wrong_code", "locked", "too_soon", "too_many", "sms_failed"] as const
@@ -50,7 +54,7 @@ function loadRazorpay(): Promise<boolean> {
   })
 }
 
-export default function CheckoutView({ cart, customer, settings, details }: Props) {
+export default function CheckoutView({ cart, customer, settings, details, estimate }: Props) {
   const { locale, t } = useI18n()
   const c = t.checkout
   const router = useRouter()
@@ -74,7 +78,11 @@ export default function CheckoutView({ cart, customer, settings, details }: Prop
   const expectedFee = settings && itemTotal < settings.free_shipping_from ? settings.shipping_fee : 0
   const deliveryFee = hasDelivery ? cart.shipping_total ?? 0 : expectedFee
   const total = hasDelivery ? cart.total ?? itemTotal + deliveryFee : itemTotal + deliveryFee
-  const codAllowed = !settings || total <= settings.cod_max_order
+  const serviceable = !estimate?.checked || estimate.serviceable
+  const codHere = !estimate?.checked || estimate.cod
+  const withinCodLimit = !settings || total <= settings.cod_max_order
+  const codAllowed = withinCodLimit && codHere
+  const canPay = hasDelivery && serviceable
   const toFree = settings ? settings.free_shipping_from - itemTotal : 0
 
   // Use the default (or only) saved address straight away
@@ -226,7 +234,13 @@ export default function CheckoutView({ cart, customer, settings, details }: Prop
                       <br />
                       {formatMobile(shipping!.phone)}
                     </p>
-                    <p className="mt-3 text-[13px] text-muted">{c.deliveryTime}</p>
+                    {!serviceable ? (
+                      <p className="mt-3 text-[13px] text-danger" data-testid="checkout-delivery-date">{c.errors.not_serviceable}</p>
+                    ) : (
+                      <p className="mt-3 text-[13px] text-saving" data-testid="checkout-delivery-date">
+                        {estimate?.date ? format(t.product.deliveryBy, { date: shortDate(estimate.date, locale) }) : c.deliveryTime}
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <div className="mt-4 flex flex-col gap-3">
@@ -264,8 +278,8 @@ export default function CheckoutView({ cart, customer, settings, details }: Prop
 
               {/* 2. Payment */}
               <section className={section} data-testid="checkout-payment">
-                {stepTitle(2, c.payment, hasDelivery && !choosing)}
-                {hasDelivery && !choosing && (
+                {stepTitle(2, c.payment, canPay && !choosing)}
+                {canPay && !choosing && (
                   <div className="mt-4 flex flex-col gap-3">
                     <fieldset className="flex flex-col gap-3" disabled={pending || !!cod}>
                       <legend className="sr-only">{c.payment}</legend>
@@ -281,7 +295,11 @@ export default function CheckoutView({ cart, customer, settings, details }: Prop
                         <span>
                           <span className="block font-medium">{c.cod}</span>
                           <span className="text-[13px] text-muted">
-                            {codAllowed ? c.codNote : format(c.codLimit, { amount: formatINR(settings!.cod_max_order) })}
+                            {codAllowed
+                              ? c.codNote
+                              : !codHere
+                                ? t.product.codUnavailable
+                                : format(c.codLimit, { amount: formatINR(settings!.cod_max_order) })}
                           </span>
                         </span>
                       </label>
@@ -405,7 +423,7 @@ export default function CheckoutView({ cart, customer, settings, details }: Prop
       </div>
 
       {/* Phones: total and button stay at the bottom */}
-      {customer && hasDelivery && !choosing && !cod && (
+      {customer && canPay && !choosing && !cod && (
         <>
           <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-4 border-t border-line bg-white p-3 small:hidden">
             <p className="flex-1 text-base font-medium">{formatINR(total)}</p>

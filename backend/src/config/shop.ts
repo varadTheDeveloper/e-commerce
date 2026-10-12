@@ -10,4 +10,8 @@ export const SHOP = {
   shippingFee: 79,
   /** Cash on delivery only for orders up to this total (delivery included) */
   codMaxOrder: 5000,
+  /** Parcel size when a product has no weight of its own (courier bookings) */
+  defaultPackage: { weightGrams: 500, lengthCm: 30, breadthCm: 25, heightCm: 5 },
+  /** Weight of one piece when the product has none */
+  defaultItemGrams: 300,
 } as const

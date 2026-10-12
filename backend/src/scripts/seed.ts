@@ -39,7 +39,9 @@ import {
 } from "./data/catalogue";
 import DEMO_PHOTOS from "./data/demo-photos.json";
 import { SHOP } from "../config/shop";
+import { SELLER } from "../config/seller";
 import { COD_PROVIDER_ID, RAZORPAY_PROVIDER_ID } from "../lib/payment-ids";
+import { SHIPPING_PROVIDER_ID } from "../modules/shiprocket/ids";
 
 const updateStoreCurrencies = createWorkflow(
   "update-store-currencies",
@@ -118,7 +120,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       selector: { id: store.id },
       update: {
         // Shown in the admin panel; placeholder until the brand name is final
-        name: process.env.STORE_NAME || "Vastra",
+        name: SELLER.brandName,
         default_sales_channel_id: defaultSalesChannel[0].id,
       },
     },
@@ -182,7 +184,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       stock_location_id: stockLocation.id,
     },
     [Modules.FULFILLMENT]: {
-      fulfillment_provider_id: "manual_manual",
+      fulfillment_provider_id: SHIPPING_PROVIDER_ID,
     },
   });
 
@@ -238,7 +240,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
       {
         name: "Standard delivery",
         price_type: "flat",
-        provider_id: "manual_manual",
+        provider_id: SHIPPING_PROVIDER_ID,
         service_zone_id: fulfillmentSet.service_zones[0].id,
         shipping_profile_id: shippingProfile.id,
         type: {
@@ -424,6 +426,8 @@ async function seedCatalogue(container: ExecArgs["container"], ids: SeedIds) {
           description: p.description.en,
           material: p.material.en,
           origin_country: "IN",
+          // HSN code for courier and invoice papers
+          hs_code: p.metadata.hsn,
           weight: p.weight,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: ids.shippingProfileId,
@@ -445,6 +449,8 @@ async function seedCatalogue(container: ExecArgs["container"], ids: SeedIds) {
               sku: `${p.handle}-${colour}-${size}`.toUpperCase(),
               options: { Size: size, Colour: colour },
               manage_inventory: true,
+              // Grams, used for the courier's package weight
+              weight: p.weight,
               prices: [{ amount: p.mrp, currency_code: "inr" }],
             }))
           ),

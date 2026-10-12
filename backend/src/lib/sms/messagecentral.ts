@@ -123,3 +123,32 @@ export async function checkMessageCentralOtp(
   }
   throw new Error(`Message Central could not check the code (HTTP ${res.status}, code ${responseCode ?? "none"})`)
 }
+
+/**
+ * Sends a text SMS (order updates) with a DLT-registered template through
+ * Message Central's MessageNow. `text` must match the template exactly, with
+ * its values filled in.
+ */
+export async function sendMessageCentralSms(
+  phone: string,
+  text: string,
+  dlt: { senderId: string; entityId: string; templateId: string },
+  config: SmsConfig,
+  fetchImpl: Fetch = fetch
+): Promise<void> {
+  const { baseUrl } = settings(config)
+  const url = new URL(`${baseUrl}/verification/v3/send`)
+  url.searchParams.set("countryCode", "91")
+  url.searchParams.set("flowType", "SMS")
+  url.searchParams.set("type", "SMS")
+  url.searchParams.set("messageType", "TRANSACTION")
+  url.searchParams.set("mobileNumber", phone.replace(/^\+91/, ""))
+  url.searchParams.set("senderId", dlt.senderId)
+  url.searchParams.set("entityId", dlt.entityId)
+  url.searchParams.set("templateId", dlt.templateId)
+  url.searchParams.set("message", text)
+  const { res, body } = await call(config, fetchImpl, url, "POST")
+  if (!res.ok || body?.responseCode !== 200) {
+    throw new Error(`Message Central did not send the SMS (HTTP ${res.status}, code ${body?.responseCode ?? "none"})`)
+  }
+}

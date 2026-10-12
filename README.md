@@ -55,7 +55,8 @@ The backend tests create and drop their own database. They read `DB_HOST`, `DB_U
 |---|---|
 | Brand name, policies shown on the site | `storefront/src/config/brand.ts` |
 | Delivery charge, free-delivery amount, COD limit | `backend/src/config/shop.ts` |
-| Seller details on GST invoices | `backend/src/config/seller.ts` |
+| Seller details on GST invoices, pickup address for couriers | `backend/src/config/seller.ts` |
+| Texts of order emails and SMS (mr/hi/en) | `backend/src/notifications/messages.ts` |
 | Brand colours | `storefront/tailwind.config.js` (`brand`, `accent`, …) |
 | Shop texts in mr / hi / en | `storefront/src/lib/i18n/dictionaries/` |
 | Colour names and swatches | `storefront/src/lib/i18n/colours.ts` |
@@ -97,8 +98,18 @@ node integration-tests/fake-razorpay.js     # http://127.0.0.1:9911
 
 (The real Razorpay payment window will not open with these keys; the browser tests replace it.)
 
+## Delivery and order updates
+
+Staff ship an order from the admin panel (**Create fulfillment**): this books the courier with Shiprocket.
+Customers see the delivery date for their pincode, follow the parcel on their order page, can cancel until it is
+shipped, and get emails/SMS at each step. Setup: `docs/SETUP-SHIPPING.md`. For local testing without Shiprocket:
+`node integration-tests/fake-shiprocket.js` (port 9912) and, in `backend/.env`,
+`SHIPROCKET_EMAIL=api@example.com SHIPROCKET_PASSWORD=fake-password SHIPROCKET_API_BASE=http://127.0.0.1:9912`.
+With the fake, pincodes starting with 9 are not served and those starting with 8 have no cash on delivery.
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.
-In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET`, `OTP_SECRET`, `REDIS_URL`
-and the three `RAZORPAY_*` values, or with the console SMS provider or a test-only API address.
+In production the server refuses to start without real `JWT_SECRET`, `COOKIE_SECRET`, `OTP_SECRET`, `REDIS_URL`,
+the `RAZORPAY_*` and `SHIPROCKET_*` values and the email settings, or with the console SMS provider or a
+test-only API address.

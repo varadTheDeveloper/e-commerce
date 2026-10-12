@@ -39,10 +39,10 @@ async function logIn(page: Page, name = "Asha") {
   await page.getByTestId("create-account-button").click()
 }
 
-async function addAddress(page: Page) {
+async function addAddress(page: Page, pincode = "431203") {
   await page.getByTestId("add-address-button").click()
   const form = page.getByTestId("address-form")
-  await form.locator("input[name=pincode]").fill("431203")
+  await form.locator("input[name=pincode]").fill(pincode)
   await form.locator("input[name=house]").fill("Flat 4, Sai Residency")
   await form.locator("input[name=area]").fill("Ambad Road")
   await form.locator("input[name=city]").fill("Jalna")
@@ -59,6 +59,7 @@ test("checkout: log in at checkout, add an address, pay cash on delivery", async
   await logIn(page)
   await addAddress(page)
 
+  await expect(page.getByTestId("checkout-delivery-date")).toContainText("Delivery by")
   // Below ₹999: delivery is charged
   await expect(page.getByTestId("checkout-delivery")).toHaveText("₹79")
   await expect(page.getByTestId("checkout-total")).toHaveText("₹978")
@@ -79,9 +80,39 @@ test("checkout: log in at checkout, add an address, pay cash on delivery", async
   expect(pdf.status()).toBe(200)
   expect(pdf.headers()["content-type"]).toBe("application/pdf")
 
+  // Delivery steps: ordered, not yet packed
+  await expect(page.getByTestId("track-placed")).toHaveAttribute("data-done", "true")
+  await expect(page.getByTestId("track-packed")).toHaveAttribute("data-done", "false")
+
   // The bag is empty after the order
   await page.goto("/en/cart")
   await expect(page.getByTestId("empty-cart-message")).toBeVisible()
+})
+
+test("orders: cancel before it is shipped", async ({ page }, info) => {
+  await addKurta(page)
+  await page.goto("/en/checkout")
+  await logIn(page)
+  await addAddress(page)
+  await page.getByTestId("cod-option").check()
+  await submit(page, info.project.name === "phone").click()
+  await expect(page.getByTestId("order-placed")).toBeVisible()
+
+  await page.getByTestId("cancel-order-button").click()
+  await expect(page.getByTestId("confirm-cancel-button")).toBeDisabled()
+  await page.getByLabel("I ordered by mistake").check()
+  await page.getByTestId("confirm-cancel-button").click()
+  await expect(page.getByTestId("order-canceled")).toContainText("Cancelled on")
+  await expect(page.getByTestId("cancel-order-button")).toHaveCount(0)
+})
+
+test("checkout: no cash on delivery where couriers cannot collect it", async ({ page }) => {
+  await addKurta(page)
+  await page.goto("/en/checkout")
+  await logIn(page)
+  await addAddress(page, "800001")
+  await expect(page.getByTestId("cod-option")).toBeDisabled()
+  await expect(page.getByTestId("checkout-payment")).toContainText("not available here")
 })
 
 test("checkout: pay online (Razorpay), free delivery from ₹999", async ({ page }, info) => {
@@ -126,4 +157,52 @@ test("checkout: Marathi texts", async ({ page }) => {
   await page.goto("/mr/checkout")
   await expect(page.getByTestId("back-to-cart-link")).toContainText("बॅगकडे परत जा")
   await expect(page.getByTestId("checkout-login")).toContainText("ऑर्डर करण्यासाठी लॉग इन करा")
+})
+
+// Staff ship the order in the admin, the courier sends an update, the customer sees it.
+// Needs E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD (an admin user) and the backend started with
+// the fake Shiprocket and SHIPROCKET_WEBHOOK_TOKEN=E2E_WEBHOOK_TOKEN (CI sets these).
+const BACKEND = process.env.E2E_BACKEND_URL || "http://localhost:9000"
+const ADMIN = { email: process.env.E2E_ADMIN_EMAIL, password: process.env.E2E_ADMIN_PASSWORD }
+const HOOK_TOKEN = process.env.E2E_WEBHOOK_TOKEN
+
+test("orders: shipped by staff, tracked by the customer", async ({ page }, info) => {
+  test.skip(!ADMIN.email || !ADMIN.password || !HOOK_TOKEN, "needs an admin user and the webhook token")
+  await addKurta(page)
+  await page.goto("/en/checkout")
+  await logIn(page)
+  await addAddress(page)
+  await page.getByTestId("cod-option").check()
+  await submit(page, info.project.name === "phone").click()
+  await expect(page.getByTestId("order-placed")).toBeVisible()
+  const orderId = page.url().match(/order\/(order_[A-Za-z0-9]+)/)![1]
+
+  // Staff: "Create fulfillment" in the admin (books the courier)
+  const login = await page.request.post(`${BACKEND}/auth/user/emailpass`, { data: ADMIN })
+  const admin = { authorization: `Bearer ${(await login.json()).token}` }
+  await expect
+    .poll(async () => (await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=metadata`, { headers: admin })).json()).order.metadata?.payment_method)
+    .toBe("cod")
+  const { order } = await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=items.*`, { headers: admin })).json()
+  const fulfil = await page.request.post(`${BACKEND}/admin/orders/${orderId}/fulfillments`, {
+    headers: admin,
+    data: { items: order.items.map((i: { id: string; quantity: number }) => ({ id: i.id, quantity: i.quantity })) },
+  })
+  expect(fulfil.status()).toBe(200)
+  const after = await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=fulfillments.*`, { headers: admin })).json()
+  const awb = after.order.fulfillments[0].data.awb
+
+  // Courier: picked up
+  const hook = await page.request.post(`${BACKEND}/hooks/delivery-updates`, {
+    headers: { "x-api-key": HOOK_TOKEN! },
+    data: { awb, current_status: "IN TRANSIT" },
+  })
+  expect(hook.status()).toBe(200)
+
+  await page.goto(`/en/account/orders/details/${orderId}`)
+  await expect(page.getByTestId("track-shipped")).toHaveAttribute("data-done", "true")
+  await expect(page.getByTestId("order-tracking")).toContainText(`Tracking number: ${awb}`)
+  await expect(page.getByTestId("track-link")).toHaveAttribute("href", `https://shiprocket.co/tracking/${awb}`)
+  // Shipped: too late to cancel
+  await expect(page.getByTestId("cancel-order-button")).toHaveCount(0)
 })

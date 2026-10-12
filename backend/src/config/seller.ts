@@ -3,6 +3,8 @@
 // information, so it may live in this public repository).
 
 export const SELLER = {
+  /** Shop name in emails and SMS (same STORE_NAME the seed uses; placeholder until the brand is named) */
+  brandName: process.env.STORE_NAME || "Vastra",
   legalName: "Vastra Clothing (placeholder)",
   address: ["Shop address line 1", "Jalna, Maharashtra 431203"],
   gstin: "27AAAAA0000A1Z5",
@@ -10,6 +12,9 @@ export const SELLER = {
   stateCode: "27",
   state: "Maharashtra",
   email: "support@example.com",
+  /** Pickup address as named in the Shiprocket panel (Settings → Pickup addresses), and its pincode */
+  pickupLocation: "Primary",
+  pickupPincode: "431203",
   /** Invoice numbers look like VS/2026-27/000123 (max 16 characters) */
   invoicePrefix: "VS",
 } as const

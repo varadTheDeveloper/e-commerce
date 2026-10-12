@@ -1,6 +1,7 @@
 import { retrieveCart } from "@lib/data/cart"
 import { listProductsFor } from "@lib/data/catalog"
 import { getShopSettings } from "@lib/data/checkout"
+import { getDeliveryEstimate } from "@lib/data/delivery"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getDictionary } from "@lib/i18n"
 import { toLocale } from "@lib/i18n/config"
@@ -28,6 +29,8 @@ export default async function Checkout(props: Props) {
   if (!cart?.items?.length) redirect(`/${locale}/cart`)
 
   const details = lineDetails(cart.items, products)
+  const pincode = cart.shipping_address?.postal_code
+  const estimate = pincode ? await getDeliveryEstimate(pincode) : null
 
-  return <CheckoutView cart={cart} customer={customer} settings={settings} details={details} />
+  return <CheckoutView cart={cart} customer={customer} settings={settings} details={details} estimate={estimate} />
 }
