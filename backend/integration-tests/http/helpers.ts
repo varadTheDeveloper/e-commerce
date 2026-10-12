@@ -113,3 +113,33 @@ export async function waitFor<T>(check: () => Promise<T>, ms = 15000): Promise<T
     await new Promise((r) => setTimeout(r, 300))
   }
 }
+
+/**
+ * Ships an order the way staff do ("Create fulfillment" for all items) and,
+ * with `deliver`, sends the courier's DELIVERED update. Needs the fake
+ * Shiprocket and SHIPROCKET_WEBHOOK_TOKEN set by the spec.
+ */
+export async function shipOrder(api: any, getContainer: () => any, orderId: string, deliver = false) {
+  const { ContainerRegistrationKeys } = require("@medusajs/framework/utils")
+  const { createOrderFulfillmentWorkflow } = require("@medusajs/medusa/core-flows")
+  const query = getContainer().resolve(ContainerRegistrationKeys.QUERY)
+  const read = async () =>
+    (await query.graph({ entity: "order", fields: ["items.*", "metadata", "fulfillments.data", "fulfillments.canceled_at"], filters: { id: orderId } }))
+      .data[0] as any
+  const order = await waitFor(async () => {
+    const o = await read()
+    return o.metadata?.payment_method ? o : null
+  })
+  await createOrderFulfillmentWorkflow(getContainer()).run({
+    input: { order_id: orderId, items: order.items.map((i: any) => ({ id: i.id, quantity: i.quantity })) },
+  })
+  const fulfillment = (await read()).fulfillments.filter((f: any) => !f.canceled_at).pop()
+  if (deliver) {
+    await api.post(
+      "/hooks/delivery-updates",
+      { awb: fulfillment.data.awb, current_status: "DELIVERED" },
+      { headers: { "x-api-key": process.env.SHIPROCKET_WEBHOOK_TOKEN } }
+    )
+  }
+  return fulfillment
+}

@@ -14,4 +14,6 @@ export const SHOP = {
   defaultPackage: { weightGrams: 500, lengthCm: 30, breadthCm: 25, heightCm: 5 },
   /** Weight of one piece when the product has none */
   defaultItemGrams: 300,
+  /** Days after delivery during which items can be returned or exchanged */
+  returnWindowDays: 7,
 } as const

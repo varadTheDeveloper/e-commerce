@@ -107,6 +107,13 @@ shipped, and get emails/SMS at each step. Setup: `docs/SETUP-SHIPPING.md`. For l
 `SHIPROCKET_EMAIL=api@example.com SHIPROCKET_PASSWORD=fake-password SHIPROCKET_API_BASE=http://127.0.0.1:9912`.
 With the fake, pincodes starting with 9 are not served and those starting with 8 have no cash on delivery.
 
+## Returns and size exchange
+
+Within 7 days of delivery, customers ask for a return or another size from their order page. Staff decide in the
+admin panel (**Returns**); approving books a free courier pickup. Online payments are refunded through Razorpay when
+the item comes back; cash-on-delivery refunds are sent by staff to the customer's UPI ID or bank account. How staff
+handle orders, cancellations and returns: `docs/STAFF-GUIDE.md`.
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.

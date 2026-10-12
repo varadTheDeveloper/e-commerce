@@ -68,11 +68,17 @@ function startFakeShiprocket({ port = 0, email = EMAIL, password = PASSWORD } = 
         state.orders.set(id, order)
         return reply(200, { order_id: id, shipment_id: order.shipment_id, status: "NEW" })
       }
+      if (req.method === "POST" && path === "/orders/create/return") {
+        const id = nextId++
+        const order = { id, shipment_id: id + 5000, input: body, status: "RETURN PENDING", awb: null, pickup: false, is_return: true }
+        state.orders.set(id, order)
+        return reply(200, { order_id: id, shipment_id: order.shipment_id, status: "RETURN PENDING" })
+      }
       const byShipment = (sid) => [...state.orders.values()].find((o) => o.shipment_id === Number(sid))
       if (req.method === "POST" && path === "/courier/assign/awb") {
         const order = byShipment(body.shipment_id)
         if (!order) return reply(404, { message: "Shipment not found" })
-        order.awb = `AWB${order.id}`
+        order.awb = `${body.is_return ? "RAWB" : "AWB"}${order.id}`
         return reply(200, {
           awb_assign_status: 1,
           response: { data: { awb_code: order.awb, courier_company_id: body.courier_id || 2, courier_name: "Fast Courier" } },

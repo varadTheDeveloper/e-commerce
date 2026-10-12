@@ -131,6 +131,8 @@ module.exports = defineConfig({
     { resolve: '@medusajs/medusa/translation' },
     // Saved products per customer (src/modules/wishlist)
     { resolve: './src/modules/wishlist' },
+    // Customer return and size-exchange requests (src/modules/returns)
+    { resolve: './src/modules/returns' },
     {
       resolve: '@medusajs/medusa/auth',
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],

@@ -1,6 +1,8 @@
 import { authenticate, defineMiddlewares, validateAndTransformBody } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import multer from "multer"
 import { CANCEL_REASONS } from "../lib/cancel"
+import { RETURN_REASONS } from "../lib/returns"
 
 export const OtpRequestSchema = z.object({ phone: z.string().min(10).max(20) })
 
@@ -21,6 +23,37 @@ export const CancelOrderSchema = z.object({
   reason: z.enum(CANCEL_REASONS),
 })
 
+const RefundSchema = z.discriminatedUnion("method", [
+  z.object({ method: z.literal("upi"), upi_id: z.string().trim().min(3).max(100) }),
+  z.object({
+    method: z.literal("bank"),
+    account_name: z.string().trim().min(2).max(100),
+    account_number: z.string().trim().max(20),
+    ifsc: z.string().trim().toUpperCase().length(11),
+  }),
+])
+
+export const CreateReturnSchema = z.object({
+  type: z.enum(["return", "exchange"]),
+  items: z
+    .array(
+      z.object({
+        line_item_id: z.string().min(1).max(100),
+        quantity: z.number().int().min(1).max(50),
+        reason: z.enum(RETURN_REASONS),
+        note: z.string().max(500).optional(),
+        exchange_variant_id: z.string().max(100).optional(),
+      })
+    )
+    .min(1)
+    .max(50),
+  photos: z.array(z.string().max(300)).max(3).optional(),
+  refund: RefundSchema.optional(),
+})
+
+// Return photos: one per request, kept in memory, at most 5 MB
+const photoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } })
+
 export default defineMiddlewares({
   routes: [
     {
@@ -31,6 +64,30 @@ export default defineMiddlewares({
       matcher: "/store/customers/me/wishlist",
       method: ["POST"],
       middlewares: [validateAndTransformBody(AddToWishlistSchema)],
+    },
+    {
+      matcher: "/admin/return-requests/:id/reject",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(z.object({ reason: z.string().trim().min(3).max(300) }))],
+    },
+    {
+      matcher: "/admin/return-requests/:id/refunded",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(z.object({ reference: z.string().trim().min(3).max(100) }))],
+    },
+    {
+      matcher: "/store/orders/:id/returns",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
+    {
+      matcher: "/store/orders/:id/returns",
+      method: ["POST"],
+      middlewares: [validateAndTransformBody(CreateReturnSchema)],
+    },
+    {
+      matcher: "/store/returns/photos",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["session", "bearer"]), photoUpload.single("photo") as any],
     },
     {
       matcher: "/store/orders/:id/tracking",

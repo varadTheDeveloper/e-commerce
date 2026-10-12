@@ -9140,6 +9140,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/express-serve-static-core@npm:^5.0.0":
+  version: 5.1.3
+  resolution: "@types/express-serve-static-core@npm:5.1.3"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/qs": "npm:*"
+    "@types/range-parser": "npm:*"
+    "@types/send": "npm:*"
+  checksum: 10c0/2312bf52f2c299fdaf3b0c60c6058dd102f7bb6ed721b6de94e334feead4a4e4b606717058400436aa841cd9499e6960a4e3d92dd2b00220a6c1435ea5fdb5e1
+  languageName: node
+  linkType: hard
+
+"@types/express@npm:*":
+  version: 5.0.6
+  resolution: "@types/express@npm:5.0.6"
+  dependencies:
+    "@types/body-parser": "npm:*"
+    "@types/express-serve-static-core": "npm:^5.0.0"
+    "@types/serve-static": "npm:^2"
+  checksum: 10c0/f1071e3389a955d4f9a38aae38634121c7cd9b3171ba4201ec9b56bd534aba07866839d278adc0dda05b942b05a901a02fd174201c3b1f70ce22b10b6c68f24b
+  languageName: node
+  linkType: hard
+
 "@types/express@npm:^4.17.21":
   version: 4.17.25
   resolution: "@types/express@npm:4.17.25"
@@ -9224,6 +9247,15 @@ __metadata:
   version: 2.1.0
   resolution: "@types/ms@npm:2.1.0"
   checksum: 10c0/5ce692ffe1549e1b827d99ef8ff71187457e0eb44adbae38fdf7b9a74bae8d20642ee963c14516db1d35fa2652e65f47680fdf679dcbde52bbfadd021f497225
+  languageName: node
+  linkType: hard
+
+"@types/multer@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@types/multer@npm:2.0.0"
+  dependencies:
+    "@types/express": "npm:*"
+  checksum: 10c0/375b0e77c4675c2ff27d1170e469df48dced928cc9fcd077ead111a20d0f2c01921fd25e20e25426604d6d3e311b37da2bc03ce47523d06adafba5c4b8077b67
   languageName: node
   linkType: hard
 
@@ -9393,6 +9425,16 @@ __metadata:
     "@types/node": "npm:*"
     "@types/send": "npm:<1"
   checksum: 10c0/842fca14c9e80468f89b6cea361773f2dcd685d4616a9f59013b55e1e83f536e4c93d6d8e3ba5072d40c4e7e64085210edd6646b15d538ded94512940a23021f
+  languageName: node
+  linkType: hard
+
+"@types/serve-static@npm:^2":
+  version: 2.2.0
+  resolution: "@types/serve-static@npm:2.2.0"
+  dependencies:
+    "@types/http-errors": "npm:*"
+    "@types/node": "npm:*"
+  checksum: 10c0/a3c6126bdbf9685e6c7dc03ad34639666eff32754e912adeed9643bf3dd3aa0ff043002a7f69039306e310d233eb8e160c59308f95b0a619f32366bbc48ee094
   languageName: node
   linkType: hard
 
@@ -11102,20 +11144,25 @@ __metadata:
     "@medusajs/admin-sdk": "npm:2.21.2"
     "@medusajs/cli": "npm:2.21.2"
     "@medusajs/framework": "npm:2.21.2"
+    "@medusajs/icons": "npm:2.21.2"
     "@medusajs/medusa": "npm:2.21.2"
     "@medusajs/test-utils": "npm:2.21.2"
+    "@medusajs/ui": "npm:4.2.6"
     "@swc/core": "npm:^1.7.28"
     "@swc/jest": "npm:^0.2.36"
     "@types/jest": "npm:^29.5.13"
+    "@types/multer": "npm:2.0.0"
     "@types/node": "npm:^20.12.11"
     "@types/pdfkit": "npm:0.17.3"
     "@types/react": "npm:^18.3.2"
     "@types/react-dom": "npm:^18.2.25"
     jest: "npm:^29.7.0"
+    multer: "npm:2.4.0"
     pdfkit: "npm:0.17.2"
     prop-types: "npm:^15.8.1"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
+    react-router-dom: "npm:7.18.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.6.2"
     vite: "npm:^5.4.14"
@@ -14131,7 +14178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multer@npm:^2.3.0":
+"multer@npm:2.4.0, multer@npm:^2.3.0":
   version: 2.4.0
   resolution: "multer@npm:2.4.0"
   dependencies:
