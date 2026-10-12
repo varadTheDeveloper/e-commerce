@@ -38,6 +38,39 @@ export type AdhocOrderInput = {
   weight: number
 }
 
+/** A return pickup: from the customer's address back to the warehouse. */
+export type ReturnOrderInput = {
+  order_id: string
+  order_date: string
+  pickup_customer_name: string
+  pickup_last_name: string
+  pickup_address: string
+  pickup_address_2: string
+  pickup_city: string
+  pickup_state: string
+  pickup_country: string
+  pickup_pincode: string
+  pickup_email: string
+  pickup_phone: string
+  shipping_customer_name: string
+  shipping_last_name: string
+  shipping_address: string
+  shipping_address_2: string
+  shipping_city: string
+  shipping_state: string
+  shipping_country: string
+  shipping_pincode: string
+  shipping_email: string
+  shipping_phone: string
+  order_items: { name: string; sku: string; units: number; selling_price: number; hsn?: string }[]
+  payment_method: "PREPAID"
+  sub_total: number
+  length: number
+  breadth: number
+  height: number
+  weight: number
+}
+
 export class ShiprocketError extends Error {
   constructor(message: string, readonly status: number) {
     super(message)
@@ -129,8 +162,16 @@ export class ShiprocketClient {
     return this.request<{ order_id: number; shipment_id: number; status?: string }>("POST", "/orders/create/adhoc", input)
   }
 
-  async assignAwb(shipmentId: number, courierId?: number) {
-    const res = await this.request<any>("POST", "/courier/assign/awb", { shipment_id: shipmentId, ...(courierId ? { courier_id: courierId } : {}) })
+  createReturnOrder(input: ReturnOrderInput) {
+    return this.request<{ order_id: number; shipment_id: number; status?: string }>("POST", "/orders/create/return", input)
+  }
+
+  async assignAwb(shipmentId: number, courierId?: number, isReturn = false) {
+    const res = await this.request<any>("POST", "/courier/assign/awb", {
+      shipment_id: shipmentId,
+      ...(courierId ? { courier_id: courierId } : {}),
+      ...(isReturn ? { is_return: 1 } : {}),
+    })
     const data = res?.response?.data ?? {}
     if (!data.awb_code) {
       throw new ShiprocketError(`Shiprocket could not assign a courier: ${String(res?.message ?? data.awb_assign_error ?? "no AWB").slice(0, 200)}`, 400)

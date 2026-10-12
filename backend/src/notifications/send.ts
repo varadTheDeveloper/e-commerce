@@ -23,7 +23,7 @@ const escapeHtml = (s: string) =>
 
 const rupees = (n: number) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`
 
-function storefrontUrl() {
+export function storefrontUrl() {
   return (process.env.STOREFRONT_URL || "http://localhost:8000").replace(/\/+$/, "")
 }
 
@@ -51,7 +51,7 @@ export async function sendEmail(
   return true
 }
 
-function renderEmail(lines: string[], button: string, link: string) {
+export function renderEmail(lines: string[], button: string, link: string) {
   const shown = lines.filter(Boolean)
   const html = `<!doctype html><html><body style="margin:0;background:#fbf9f6;font-family:Mukta,Arial,sans-serif;color:#1c1b19">
 <div style="max-width:520px;margin:0 auto;padding:32px 24px">

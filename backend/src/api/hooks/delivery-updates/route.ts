@@ -7,6 +7,8 @@ import {
 } from "@medusajs/medusa/core-flows"
 import { timingSafeEqual } from "crypto"
 import { COD_PROVIDER_ID } from "../../../lib/payment-ids"
+import { completeExchangeFor } from "../../../lib/return-actions"
+import { RETURNS_MODULE } from "../../../modules/returns"
 import { nextTracking, stageFor, Tracking } from "../../../lib/tracking"
 import { trackingUrl } from "../../../modules/shiprocket/service"
 
@@ -51,6 +53,16 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return res.sendStatus(200)
   }
 
+  // A return pickup on its way back to the warehouse
+  const returns = req.scope.resolve(RETURNS_MODULE) as any
+  const [returnRequest] = await returns.listReturnRequests({ pickup_awb: awb }, { take: 1 })
+  if (returnRequest) {
+    if (["shipped", "out_for_delivery", "delivered"].includes(stage) && returnRequest.status === "approved") {
+      await returns.updateReturnRequests({ id: returnRequest.id, status: "picked_up" })
+    }
+    return res.sendStatus(200)
+  }
+
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
   // Our order id is the start of the id we gave Shiprocket; without it, find the parcel by its tracking number
   let orderId = String(body.order_id ?? body.channel_order_id ?? "").split("-")[0]
@@ -69,6 +81,8 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       "fulfillments.canceled_at",
       "fulfillments.data",
       "fulfillments.items.line_item_id",
+      "items.id",
+      "items.metadata",
       "fulfillments.items.quantity",
       "fulfillments.labels.tracking_number",
       "payment_collections.payments.id",
@@ -100,6 +114,11 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const reached = (s: string) => ["shipped", "out_for_delivery", "delivery_failed", "delivered"].includes(s)
   if (reached(stage) && !fulfillment.shipped_at) {
+    // A new size sent for an exchange: that request is now complete
+    for (const fi of fulfillment.items ?? []) {
+      const requestId = (order.items ?? []).find((i: any) => i.id === fi.line_item_id)?.metadata?.return_request_id
+      if (requestId) await completeExchangeFor(req.scope, requestId)
+    }
     await createOrderShipmentWorkflow(req.scope).run({
       input: {
         order_id: order.id,
@@ -117,6 +136,8 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       .find((p: any) => p.provider_id === COD_PROVIDER_ID && !p.captured_at)
     if (cod) {
       await capturePaymentWorkflow(req.scope).run({ input: { payment_id: cod.id } })
+      // Later parcels for this order (exchanges) must not collect cash again
+      await req.scope.resolve(Modules.ORDER).updateOrders([{ id: order.id, metadata: { cod_collected: true } }])
     }
   }
   res.sendStatus(200)

@@ -15,6 +15,15 @@ export const SELLER = {
   /** Pickup address as named in the Shiprocket panel (Settings → Pickup addresses), and its pincode */
   pickupLocation: "Primary",
   pickupPincode: "431203",
+  /** Where returned items are sent (usually the same place as the pickup address) */
+  warehouse: {
+    name: "Vastra Warehouse",
+    address: "Shop address line 1",
+    city: "Jalna",
+    state: "Maharashtra",
+    pincode: "431203",
+    phone: "9000000000",
+  },
   /** Invoice numbers look like VS/2026-27/000123 (max 16 characters) */
   invoicePrefix: "VS",
 } as const

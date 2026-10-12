@@ -1,4 +1,5 @@
-import { expect, Page, test } from "@playwright/test"
+import { expect, test } from "@playwright/test"
+import { addAddress, addKurta, adminHeaders, canShip, courierUpdate, logIn, shipOrder, submit } from "./helpers"
 
 // Needs the backend in test mode (SMS_PROVIDER=console, OTP_TEST_CODE=123456) and,
 // for the online payment test, the fake Razorpay API:
@@ -9,48 +10,6 @@ import { expect, Page, test } from "@playwright/test"
 
 const FAKE_RAZORPAY = process.env.FAKE_RAZORPAY_URL || "http://127.0.0.1:9911"
 const SHOTS = process.env.E2E_SCREENSHOTS
-
-let counter = 0
-function newPhone() {
-  counter++
-  return `8${String(Date.now() + counter * 7919).slice(-9)}`
-}
-
-async function addKurta(page: Page, quantity = 1) {
-  await page.goto("/en/products/cotton-straight-kurta")
-  await page.getByTestId("colour-maroon").click()
-  await page.getByTestId("size-L").click()
-  await page.getByTestId("add-product-button").click()
-  await expect(page.getByTestId("go-to-bag")).toBeVisible()
-  if (quantity > 1) {
-    await page.goto("/en/cart")
-    for (let q = 2; q <= quantity; q++) {
-      await page.getByTestId("bag-item-increase").click()
-      await expect(page.getByTestId("bag-item-qty")).toHaveText(String(q))
-    }
-  }
-}
-
-async function logIn(page: Page, name = "Asha") {
-  await page.getByTestId("phone-input").fill(newPhone())
-  await page.getByTestId("send-code-button").click()
-  await page.getByTestId("code-input").fill("123456")
-  await page.getByTestId("first-name-input").fill(name)
-  await page.getByTestId("create-account-button").click()
-}
-
-async function addAddress(page: Page, pincode = "431203") {
-  await page.getByTestId("add-address-button").click()
-  const form = page.getByTestId("address-form")
-  await form.locator("input[name=pincode]").fill(pincode)
-  await form.locator("input[name=house]").fill("Flat 4, Sai Residency")
-  await form.locator("input[name=area]").fill("Ambad Road")
-  await form.locator("input[name=city]").fill("Jalna")
-  await page.getByTestId("save-address-button").click()
-  await expect(page.getByTestId("chosen-address")).toContainText("Ambad Road")
-}
-
-const submit = (page: Page, phone: boolean) => page.getByTestId(phone ? "submit-order-button-mobile" : "submit-order-button")
 
 test("checkout: log in at checkout, add an address, pay cash on delivery", async ({ page }, info) => {
   await addKurta(page)
@@ -160,14 +119,9 @@ test("checkout: Marathi texts", async ({ page }) => {
 })
 
 // Staff ship the order in the admin, the courier sends an update, the customer sees it.
-// Needs E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD (an admin user) and the backend started with
-// the fake Shiprocket and SHIPROCKET_WEBHOOK_TOKEN=E2E_WEBHOOK_TOKEN (CI sets these).
-const BACKEND = process.env.E2E_BACKEND_URL || "http://localhost:9000"
-const ADMIN = { email: process.env.E2E_ADMIN_EMAIL, password: process.env.E2E_ADMIN_PASSWORD }
-const HOOK_TOKEN = process.env.E2E_WEBHOOK_TOKEN
-
+// Needs an admin user and the webhook token (see helpers.ts).
 test("orders: shipped by staff, tracked by the customer", async ({ page }, info) => {
-  test.skip(!ADMIN.email || !ADMIN.password || !HOOK_TOKEN, "needs an admin user and the webhook token")
+  test.skip(!canShip, "needs an admin user and the webhook token")
   await addKurta(page)
   await page.goto("/en/checkout")
   await logIn(page)
@@ -178,26 +132,9 @@ test("orders: shipped by staff, tracked by the customer", async ({ page }, info)
   const orderId = page.url().match(/order\/(order_[A-Za-z0-9]+)/)![1]
 
   // Staff: "Create fulfillment" in the admin (books the courier)
-  const login = await page.request.post(`${BACKEND}/auth/user/emailpass`, { data: ADMIN })
-  const admin = { authorization: `Bearer ${(await login.json()).token}` }
-  await expect
-    .poll(async () => (await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=metadata`, { headers: admin })).json()).order.metadata?.payment_method)
-    .toBe("cod")
-  const { order } = await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=items.*`, { headers: admin })).json()
-  const fulfil = await page.request.post(`${BACKEND}/admin/orders/${orderId}/fulfillments`, {
-    headers: admin,
-    data: { items: order.items.map((i: { id: string; quantity: number }) => ({ id: i.id, quantity: i.quantity })) },
-  })
-  expect(fulfil.status()).toBe(200)
-  const after = await (await page.request.get(`${BACKEND}/admin/orders/${orderId}?fields=fulfillments.*`, { headers: admin })).json()
-  const awb = after.order.fulfillments[0].data.awb
-
+  const awb = await shipOrder(page, orderId, await adminHeaders(page))
   // Courier: picked up
-  const hook = await page.request.post(`${BACKEND}/hooks/delivery-updates`, {
-    headers: { "x-api-key": HOOK_TOKEN! },
-    data: { awb, current_status: "IN TRANSIT" },
-  })
-  expect(hook.status()).toBe(200)
+  await courierUpdate(page, awb, "IN TRANSIT")
 
   await page.goto(`/en/account/orders/details/${orderId}`)
   await expect(page.getByTestId("track-shipped")).toHaveAttribute("data-done", "true")

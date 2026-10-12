@@ -73,7 +73,8 @@ export function shiprocketOrderFor(order: any, items: { line_item_id?: string; q
     billing_phone: phone,
     shipping_is_billing: true,
     order_items: lines.map(({ grams: _g, ...l }) => l),
-    payment_method: method === "cod" ? "COD" : "Prepaid",
+    // Exchanges ship after the COD money was collected: nothing to collect then
+    payment_method: method === "cod" && !order.metadata?.cod_collected ? "COD" : "Prepaid",
     sub_total: subTotal,
     shipping_charges: Number(order.shipping_total ?? 0),
     length: SHOP.defaultPackage.lengthCm,
@@ -180,7 +181,7 @@ class ShiprocketFulfillmentService extends AbstractFulfillmentProviderService {
   }
 
   async createReturnFulfillment(): Promise<CreateFulfillmentResult> {
-    // Return pickups come with Step 6 (returns and size exchange)
+    // Return pickups are booked by the returns flow (src/lib/return-actions.ts), not here
     return { data: {}, labels: [] }
   }
 }

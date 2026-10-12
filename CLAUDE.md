@@ -30,7 +30,7 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
 3. (done) Account + bag: phone OTP login (custom auth provider `phone-otp`), Indian addresses, account wishlist, bag page.
 4. (done) Checkout: address, Razorpay (manual capture, checked on the server, signed webhook), COD (limit + SMS code), stock check, delivery charge, GST invoice PDF.
 5. (done) Orders + shipping: Shiprocket (pincode check, booking from the admin, tracking webhook), order timeline, email (Resend) + SMS (Message Central, DLT) updates, cancel before dispatch.
-6. Returns + size exchange.
+6. (done) Returns + size exchange: 7 days after delivery, free pickup (Shiprocket), photos for damaged/wrong items, COD refunds by staff to UPI/bank, online refunds through Razorpay, staff page in the admin, staff guide `docs/STAFF-GUIDE.md`.
 7. Quality: Playwright end-to-end purchase test, phone speed check, security review, legal pages (India E-Commerce Rules 2020: seller details, grievance officer, country of origin, return policy; DPDP Act consent), staging on AWS.
 Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer profiles, segments, tickets), dashboards.
 
@@ -74,6 +74,16 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
   MessageNow SMS when `SMS_ORDER_UPDATES=true` and the DLT template id is set). Texts in mr/hi/en in
   `src/notifications/messages.ts`; SMS texts must match docs/SETUP-SHIPPING.md (a test checks).
   Order language = `order.locale` (from the cart, set from the language cookie).
+- Returns: module `backend/src/modules/returns` (`ReturnRequest`: requested → approved → picked_up → received →
+  refund_due/refunded, or completed for exchanges; rejected). Rules in `src/lib/returns.ts`
+  (`SHOP.returnWindowDays` after delivery; product `metadata.returnable: false` excluded; one exchange per item,
+  same colour, size in stock). Customer: `GET/POST /store/orders/:id/returns`, photos `POST /store/returns/photos`
+  (checked image bytes, stored under `returns/<customer id>/`). Staff: `/admin/return-requests/...` (approve books
+  a Shiprocket return pickup and starts Medusa's return/exchange in `src/lib/medusa-returns.ts`; receive restocks
+  and refunds online payments; COD refunds are recorded by staff, then the UPI/bank details are deleted). Admin page
+  `src/admin/routes/return-requests`. Return pickup tracking comes through the same delivery webhook (by AWB).
+  Emails in mr/hi/en: `src/notifications/return-messages.ts`. Storefront: order page section
+  `modules/order/returns-section.tsx`, form `/account/orders/details/[id]/return`.
 - Tests use fakes: `backend/integration-tests/fake-razorpay.js`, `fake-shiprocket.js` (both also run by CI for the
   browser tests; Playwright replaces Razorpay's checkout.js with a stand-in) and `fake-messaging.js` (Resend +
   Message Central, backend tests only). The "shipped by staff" browser test needs E2E_ADMIN_EMAIL/PASSWORD and
@@ -99,7 +109,10 @@ server would pick up the tests' delayed jobs (the Razorpay webhook test then fai
 - Shiprocket, Resend and MessageNow SMS are tested only against fakes built from their docs, not the live services.
   Shiprocket's webhook body format is assumed (`awb`, `current_status`, `order_id`); unknown statuses are logged.
 - Order-update SMS need DLT templates (docs/SETUP-SHIPPING.md); off until then. Emails need a verified Resend domain.
-- Returns use the manual fulfillment provider until Step 6.
+- Returns: no SMS for return updates (email only). If Shiprocket refuses a return pickup, staff book it by hand
+  (the admin shows the error). No button to refuse a parcel after pickup. Shiprocket's return API is tested only
+  against the fake. The warehouse address for returns (`config/seller.ts`) is a placeholder.
+- Return photos use Medusa's local file storage (`backend/static/`); switch to S3 before launch.
 - Razorpay is tested only against a fake of its API and a stand-in for its payment window, not the live service.
 - Seller details, HSN codes and the GST rules need the client's accountant to confirm before launch (docs/SETUP-PAYMENTS.md).
 - Medusa's own tax is 0: prices include GST, and the invoice splits GST out. Change this if B2B (GST credit) sales are added.
