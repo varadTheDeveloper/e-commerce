@@ -34,8 +34,15 @@ const PRODUCT_FIELDS = [
 /** Shop catalogue is small (hundreds of products), so pages load it whole and filter in memory. */
 const MAX_PRODUCTS = 500
 
+/**
+ * Catalogue data is cached, then fetched again at most every 5 minutes, so changes made in the
+ * admin (prices, new products, photos) reach the website without a new deploy. The bag and
+ * checkout always use the backend's live prices and stock.
+ */
+const CATALOG_REVALIDATE_SECONDS = 300
+
 async function cacheOptions(tag: string) {
-  return { ...(await getCacheOptions(tag)) }
+  return { ...(await getCacheOptions(tag)), revalidate: CATALOG_REVALIDATE_SECONDS }
 }
 
 export async function listCategoryTree(locale: string) {

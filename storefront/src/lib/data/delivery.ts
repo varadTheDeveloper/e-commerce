@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { forwardedFor } from "@lib/util/client-ip"
 
 export type DeliveryEstimate = {
   serviceable: boolean
@@ -15,6 +16,6 @@ export type DeliveryEstimate = {
 export async function getDeliveryEstimate(pincode: string): Promise<DeliveryEstimate | null> {
   if (!/^[1-9]\d{5}$/.test(pincode)) return null
   return sdk.client
-    .fetch<DeliveryEstimate>("/store/delivery-estimate", { method: "GET", query: { pincode }, cache: "no-store" })
+    .fetch<DeliveryEstimate>("/store/delivery-estimate", { method: "GET", query: { pincode }, headers: await forwardedFor(), cache: "no-store" })
     .catch(() => null)
 }

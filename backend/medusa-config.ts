@@ -72,6 +72,14 @@ if (isProduction) {
   }
 }
 
+// Uploaded files: S3 needs the bucket's public address too
+if (process.env.S3_BUCKET && !process.env.S3_FILE_URL) {
+  throw new Error('S3_FILE_URL must be set with S3_BUCKET (e.g. https://<bucket>.s3.ap-south-1.amazonaws.com)')
+}
+if (isProduction && !process.env.S3_BUCKET && !process.env.FILE_BASE_URL) {
+  throw new Error('Set S3_BUCKET (S3) or FILE_BASE_URL (server disk) in production, or uploaded photos get localhost addresses')
+}
+
 // With REDIS_URL set, events, workflows and locks go through Redis
 // (needed when the server and worker run as separate processes).
 // Without it (local development), Medusa uses its in-memory defaults.
@@ -179,6 +187,35 @@ module.exports = defineConfig({
               maxOrder: SHOP.codMaxOrder,
             },
           },
+        ],
+      },
+    },
+    {
+      // Uploaded files (return photos, product images added in the admin). With S3_BUCKET set
+      // they go to S3, using the server's IAM role (no access keys in files); otherwise to the
+      // server's disk under static/, served by the backend at FILE_BASE_URL.
+      resolve: '@medusajs/medusa/file',
+      options: {
+        providers: [
+          process.env.S3_BUCKET
+            ? {
+                resolve: '@medusajs/medusa/file-s3',
+                id: 's3',
+                options: {
+                  authentication_method: 's3-iam-role',
+                  bucket: process.env.S3_BUCKET,
+                  region: process.env.S3_REGION || 'ap-south-1',
+                  file_url: process.env.S3_FILE_URL,
+                  // Buckets with "Object Ownership: bucket owner enforced" refuse ACLs;
+                  // public reading is set by the bucket policy instead (docs/EC2-SETUP.md)
+                  acl: false,
+                },
+              }
+            : {
+                resolve: '@medusajs/medusa/file-local',
+                id: 'local',
+                options: { backend_url: process.env.FILE_BASE_URL || 'http://localhost:9000/static' },
+              },
         ],
       },
     },

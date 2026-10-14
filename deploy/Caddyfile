@@ -1,0 +1,27 @@
+# Caddy gets and renews the HTTPS certificates by itself (Let's Encrypt).
+# SHOP_DOMAIN and API_DOMAIN come from /opt/shop/caddy.env; both DNS records must point at this
+# server, with ports 80 and 443 open. After a change: sudo docker compose restart caddy
+#
+# Caddy sets X-Forwarded-For itself and ignores any value a visitor sends, so the backend's
+# per-address limits see real visitor addresses.
+
+{$SHOP_DOMAIN} {
+	encode zstd gzip
+	# Demo password for the whole website (/opt/shop/demo-auth.caddy, made in docs/EC2-SETUP.md).
+	# An empty file turns it off: do that for the real launch.
+	import /etc/caddy/demo-auth.caddy
+	reverse_proxy storefront:8000
+}
+
+# Medusa API, staff admin (/app) and webhooks (Razorpay, delivery updates)
+{$API_DOMAIN} {
+	encode zstd gzip
+	header {
+		# The admin must never be shown inside another site's frame
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+	reverse_proxy backend:9000
+}

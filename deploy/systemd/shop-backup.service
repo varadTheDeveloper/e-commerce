@@ -1,0 +1,9 @@
+[Unit]
+Description=Shop database backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/opt/shop/backup.env
+ExecStart=/opt/shop/app/deploy/backup.sh

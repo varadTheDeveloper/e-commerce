@@ -35,7 +35,9 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
    7a. (done) Legal/help pages (mr/hi/en, placeholder seller details, "draft" notice), consent at sign-up, delete my account.
    7b. (done) Phone speed check, accessibility (axe + keyboard), security review, "golden path" browser test.
        Results and what is left: `docs/QUALITY.md`.
-   7c. Staging on AWS (EC2 + Docker; RDS still to be decided by the owner).
+   7c. (done, not yet run on the server) Test copy on AWS: one t3.micro EC2 with Docker (Caddy + website + Medusa +
+       Postgres + Redis), images built by GitHub Actions, demo password, nightly backups: `docs/EC2-SETUP.md`.
+       Before real customers: at least t3.medium, production keys, demo password off.
 Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer profiles, segments, tickets), dashboards.
 
 ## How the shop works (storefront)
@@ -44,7 +46,9 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
 - UI strings: `src/lib/i18n/dictionaries/{en,hi,mr}.ts` (en defines the type). Server: `getDictionary(locale)`; client: `useI18n()`.
 - Catalogue reads: `src/lib/data/catalog.ts`, always passing the locale explicitly (sends `x-medusa-locale`), so pre-built pages are right.
 - Filters/sort/search are pure functions in `src/lib/util/catalog.ts` and `search.ts`, applied in memory (catalogue loaded whole, max 500).
-- Product pages are pre-built for every language (`generateStaticParams`).
+- Product pages are rendered on each visit (the layout reads cookies), not pre-built, although `generateStaticParams`
+  exists. Catalogue data is cached and fetched again at most every 5 minutes (`lib/data/catalog.ts`), so admin
+  changes show without a deploy.
 - Backend: translation module is listed explicitly in `medusa-config.ts` (the feature flag alone is read too late).
 - Login: `backend/src/modules/phone-otp-auth` (code hash in the auth identity's provider_metadata), routes
   `/store/otp/request` (send code, rate-limited) and `/store/otp/account` (create customer from the verified phone),
@@ -126,7 +130,9 @@ server would pick up the tests' delayed jobs (the Razorpay webhook test then fai
 - Real SMS: the client is signing up with Message Central (docs/SETUP-SMS.md, option A); until the keys are on the
   server, login works only in test mode. Message Central is tested only against a fake of their API, not the live service.
 - Rate limits (codes, staff login, photo uploads, pincode checks) are in memory (one server); move to Redis if
-  scaled out. They key on `req.ip`: behind a proxy, Express must trust it (Step 7c).
+  scaled out. They key on `req.ip` (Medusa trusts one proxy hop). Calls the website makes for a visitor
+  (login codes, pincode checks) pass the visitor's address in X-Forwarded-For (`storefront/src/lib/util/client-ip.ts`);
+  without it every customer would share one limit. Caddy overwrites X-Forwarded-For, so visitors can't fake it.
 - No full Content-Security-Policy for scripts yet (Next.js inline scripts, Razorpay). Build/test tools still have
   audit advisories (not on the live servers); see docs/QUALITY.md.
 - Shiprocket, Resend and MessageNow SMS are tested only against fakes built from their docs, not the live services.
@@ -135,12 +141,15 @@ server would pick up the tests' delayed jobs (the Razorpay webhook test then fai
 - Returns: no SMS for return updates (email only). If Shiprocket refuses a return pickup, staff book it by hand
   (the admin shows the error). No button to refuse a parcel after pickup. Shiprocket's return API is tested only
   against the fake. The warehouse address for returns (`config/seller.ts`) is a placeholder.
-- Return photos use Medusa's local file storage (`backend/static/`); switch to S3 before launch.
+- Uploaded photos: server disk (`FILE_BASE_URL`) or S3 with the server's IAM role (`S3_BUCKET`, `S3_FILE_URL`;
+  `medusa-config.ts`). Return photos are public but unguessable URLs; a private bucket with short links is still to do.
 - Razorpay is tested only against a fake of its API and a stand-in for its payment window, not the live service.
 - Seller details, HSN codes and the GST rules need the client's accountant to confirm before launch (docs/SETUP-PAYMENTS.md).
 - Medusa's own tax is 0: prices include GST, and the invoice splits GST out. Change this if B2B (GST credit) sales are added.
 - Stock is checked before payment and again when the order is placed; it is not held while the customer pays.
 - Legal pages use placeholder seller and grievance-officer details and are drafts (not reviewed by a lawyer).
-- `next.config.js` image hosts list only localhost and Medusa's demo buckets: add the production image host (S3/CloudFront) at deploy time.
+- Image hosts for the website are set at build time (`IMAGE_HOSTS`; `ALLOW_LOCALHOST_IMAGES=false` on the server).
 - The Next.js build fetches products from the backend, so CI starts the backend first.
-- Docker compose file not tested in the cloud dev box (no Docker daemon there); local Postgres/Redis were used instead.
+- Docker is not available in the cloud dev box: the server setup (`deploy/`) was checked by building and running the
+  same steps without Docker, validating the compose file and Caddyfile, and running Caddy; the images themselves are
+  first built by GitHub Actions and first run on the server.

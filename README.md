@@ -127,6 +127,11 @@ Phone speed, accessibility and security checks, with results and what is left: `
 The browser tests include an accessibility check (axe), a keyboard-only purchase, a speed budget and one full
 "golden path" from search to refund.
 
+## Server (test copy on AWS)
+
+One small EC2 server runs everything in Docker: Caddy (HTTPS), the website, Medusa, Postgres and Redis. GitHub
+Actions builds the images, and the website sits behind a demo password. Step by step: `docs/EC2-SETUP.md`.
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.
