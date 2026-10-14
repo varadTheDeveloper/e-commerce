@@ -50,7 +50,7 @@ services:
     restart: unless-stopped
     env_file: /opt/shop/backend.env
     environment:
-      # NODE_ENV comes from backend.env: "development" for the test copy (test login codes,
+      # NODE_ENV comes from backend.env: "staging" for the test copy (test login codes,
       # no real keys yet), "production" for real customers (refuses to start without real keys)
       MEDUSA_WORKER_MODE: shared
       NODE_OPTIONS: --max-old-space-size=448
