@@ -18,8 +18,9 @@ server (Docker, Caddy for HTTPS, secrets only in `/opt/shop/*.env`). No secrets 
 
 ## Test mode (what "test copy" means)
 
-`NODE_ENV=development` in `backend.env`, like Lexauraa's staging. Production mode refuses to start until every real
-key exists (Razorpay, Shiprocket, Message Central, Resend).
+`NODE_ENV=staging` in `backend.env`. Production mode refuses to start until every real key exists (Razorpay,
+Shiprocket, Message Central, Resend). Don't use `development` on the server: Medusa then tries to start its admin
+development server, which the image doesn't contain, and the backend restarts in a loop.
 
 | Part | In test mode |
 | --- | --- |
@@ -38,6 +39,17 @@ Measured on 14 October 2026, on a copy of this setup run on one CPU core (not ye
 | 5 | 15.7 | 0.26 s | 0.68 s |
 | 10 | 17.9 | 0.55 s | 0.77 s |
 | 20 | 17.5 | 1.09 s | 1.64 s |
+
+Measured on the real server (`shop.lexauraa.in`, 14 October 2026), from a test computer outside India
+(about 0.25 s network delay each way included), home page in Marathi:
+
+| Visitors browsing at once | Pages per second | Typical page | Slowest 3 % | Errors |
+| --- | --- | --- | --- | --- |
+| 5 | 9.6 | 0.48 s | 2.1 s | 0 |
+| 10 | 12.2 | 0.78 s | 2.1 s | 0 |
+| 20 | 16.2 | 1.21 s | 2.4 s | 0 |
+
+After the test: no restarts, about 750 MB memory used plus 300 MB swap.
 
 - **Memory, quiet:** about 414 MB backend + 122 MB website + about 100 MB Postgres.
 - **Memory under load:** about 450 + 280 MB. A t3.micro will use swap when busy.
@@ -102,8 +114,8 @@ umask 077
 PGPW=$(openssl rand -hex 32)
 printf 'POSTGRES_USER=shop\nPOSTGRES_DB=shop\nPOSTGRES_PASSWORD=%s\n' "$PGPW" > /opt/shop/db.env
 cat > /opt/shop/backend.env <<EOF
-NODE_ENV=development
-DATABASE_URL=postgres://shop:$PGPW@db:5432/shop
+NODE_ENV=staging
+DATABASE_URL=postgres://shop:$PGPW@db:5432/shop?sslmode=disable
 REDIS_URL=redis://redis:6379
 JWT_SECRET=$(openssl rand -hex 32)
 COOKIE_SECRET=$(openssl rand -hex 32)
@@ -121,6 +133,10 @@ printf 'NEXT_PUBLIC_DEFAULT_REGION=in\n' > /opt/shop/storefront.env
 printf 'SHOP_DOMAIN=%s\nAPI_DOMAIN=%s\n' "$SHOP" "$API" > /opt/shop/caddy.env
 unset PGPW
 ```
+`sslmode=disable` is needed: Medusa tries SSL for every database address except `localhost`, and the Postgres
+container has no SSL, so without it the backend waits and fails with "Could not connect to the database while
+running migrations". The database is only reachable on Docker's internal network.
+
 Demo password for the website (username `demo`; the password is typed, not shown, and only its hash is saved):
 ```bash
 read -rsp "Demo password: " PW; echo

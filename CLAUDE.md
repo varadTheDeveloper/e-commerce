@@ -35,7 +35,7 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
    7a. (done) Legal/help pages (mr/hi/en, placeholder seller details, "draft" notice), consent at sign-up, delete my account.
    7b. (done) Phone speed check, accessibility (axe + keyboard), security review, "golden path" browser test.
        Results and what is left: `docs/QUALITY.md`.
-   7c. (done, not yet run on the server) Test copy on AWS: one t3.micro EC2 with Docker (Caddy + website + Medusa +
+   7c. (done, running at https://shop.lexauraa.in, API https://shop-api.lexauraa.in) Test copy on AWS: one t3.micro EC2 with Docker (Caddy + website + Medusa +
        Postgres + Redis), images built by GitHub Actions, demo password, nightly backups: `docs/EC2-SETUP.md`.
        Before real customers: at least t3.medium, production keys, demo password off.
 Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer profiles, segments, tickets), dashboards.
