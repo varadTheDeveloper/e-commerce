@@ -1,8 +1,9 @@
 import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, MedusaError, Modules } from "@medusajs/framework/utils"
+import { PRIVACY_VERSION } from "../../../../config/privacy"
 import { createPhoneCustomerWorkflow } from "../../../../workflows/create-phone-customer"
 
-export type OtpAccountBody = { first_name: string; last_name?: string; email?: string }
+export type OtpAccountBody = { first_name: string; last_name?: string; email?: string; privacy_consent: true }
 
 /**
  * POST /store/otp/account — creates the customer for a phone that was just
@@ -26,7 +27,14 @@ export const POST = async (req: AuthenticatedMedusaRequest<OtpAccountBody>, res:
   const { result } = await createPhoneCustomerWorkflow(req.scope).run({
     input: {
       authIdentityId: identity.id,
-      customerData: { phone, first_name, last_name: last_name || null, email: email || null },
+      customerData: {
+        phone,
+        first_name,
+        last_name: last_name || null,
+        email: email || null,
+        // What they agreed to, and when (DPDP Act: consent must be provable)
+        metadata: { privacy_consent: { version: PRIVACY_VERSION, at: new Date().toISOString() } },
+      },
     },
   })
 

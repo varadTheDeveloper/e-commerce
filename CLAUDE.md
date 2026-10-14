@@ -31,7 +31,10 @@ Prices are INR. Medusa v2 stores amounts in major units (999 = ₹999).
 4. (done) Checkout: address, Razorpay (manual capture, checked on the server, signed webhook), COD (limit + SMS code), stock check, delivery charge, GST invoice PDF.
 5. (done) Orders + shipping: Shiprocket (pincode check, booking from the admin, tracking webhook), order timeline, email (Resend) + SMS (Message Central, DLT) updates, cancel before dispatch.
 6. (done) Returns + size exchange: 7 days after delivery, free pickup (Shiprocket), photos for damaged/wrong items, COD refunds by staff to UPI/bank, online refunds through Razorpay, staff page in the admin, staff guide `docs/STAFF-GUIDE.md`.
-7. Quality: Playwright end-to-end purchase test, phone speed check, security review, legal pages (India E-Commerce Rules 2020: seller details, grievance officer, country of origin, return policy; DPDP Act consent), staging on AWS.
+7. Quality, in 3 PRs:
+   7a. (done) Legal/help pages (mr/hi/en, placeholder seller details, "draft" notice), consent at sign-up, delete my account.
+   7b. Phone speed check, accessibility (axe), security review, one full "golden path" browser test.
+   7c. Staging on AWS (EC2 + Docker; RDS still to be decided by the owner).
 Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer profiles, segments, tickets), dashboards.
 
 ## How the shop works (storefront)
@@ -84,6 +87,14 @@ Later phases: reviews, recommendations, offers, loyalty, PWA, CRM (customer prof
   `src/admin/routes/return-requests`. Return pickup tracking comes through the same delivery webhook (by AWB).
   Emails in mr/hi/en: `src/notifications/return-messages.ts`. Storefront: order page section
   `modules/order/returns-section.tsx`, form `/account/orders/details/[id]/return`.
+- Legal pages: `/[locale]/{about,contact,shipping,returns-policy,privacy,terms,grievance,faq}`, texts in
+  `storefront/src/lib/legal/{en,hi,mr}.ts` with {placeholders} from `src/config/seller.ts` (PLACEHOLDERS; name, GSTIN
+  and email must match backend `config/seller.ts`, a test checks) and `config/brand.ts`. `SELLER.policiesDraft`
+  shows the "draft for testing" notice. A lawyer must review the wording before launch.
+- Privacy: sign-up needs `privacy_consent: true` (18+, privacy policy and terms); stored as
+  `customer.metadata.privacy_consent` {version (`backend/src/config/privacy.ts`, change it when the policy changes), at}.
+  "Delete my account": `POST /store/customers/me/delete` (`src/lib/delete-account.ts`): refused while an order is
+  undelivered or a return open; removes name, phone, email, addresses, wishlist and the login; orders stay (GST records).
 - Tests use fakes: `backend/integration-tests/fake-razorpay.js`, `fake-shiprocket.js` (both also run by CI for the
   browser tests; Playwright replaces Razorpay's checkout.js with a stand-in) and `fake-messaging.js` (Resend +
   Message Central, backend tests only). The "shipped by staff" browser test needs E2E_ADMIN_EMAIL/PASSWORD and
@@ -117,7 +128,7 @@ server would pick up the tests' delayed jobs (the Razorpay webhook test then fai
 - Seller details, HSN codes and the GST rules need the client's accountant to confirm before launch (docs/SETUP-PAYMENTS.md).
 - Medusa's own tax is 0: prices include GST, and the invoice splits GST out. Change this if B2B (GST credit) sales are added.
 - Stock is checked before payment and again when the order is placed; it is not held while the customer pays.
-- Footer help/legal entries are plain text until those pages exist (Step 7).
+- Legal pages use placeholder seller and grievance-officer details and are drafts (not reviewed by a lawyer).
 - `next.config.js` image hosts list only localhost and Medusa's demo buckets: add the production image host (S3/CloudFront) at deploy time.
 - The Next.js build fetches products from the backend, so CI starts the backend first.
 - Docker compose file not tested in the cloud dev box (no Docker daemon there); local Postgres/Redis were used instead.

@@ -10,15 +10,19 @@ export default function Footer({
   t: Dictionary
   categories: NavCategory[]
 }) {
-  // Help and legal pages are written in Step 7. Until then they show as plain text, not dead links.
   const help = [
-    { label: t.footer.contactUs },
-    { label: t.footer.shipping },
-    { label: t.footer.returns },
-    { label: t.footer.faq },
+    { href: "/contact", label: t.footer.contactUs },
+    { href: "/shipping", label: t.footer.shipping },
+    { href: "/returns-policy", label: t.footer.returns },
+    { href: "/faq", label: t.footer.faq },
     { href: "/account/orders", label: t.footer.trackOrder },
   ]
-  const legal = [{ label: t.footer.privacy }, { label: t.footer.terms }, { label: t.footer.grievance }]
+  const legal = [
+    { href: "/about", label: t.footer.aboutUs },
+    { href: "/privacy", label: t.footer.privacy },
+    { href: "/terms", label: t.footer.terms },
+    { href: "/grievance", label: t.footer.grievance },
+  ]
 
   return (
     <footer className="mt-20 bg-ink pb-20 text-white small:pb-0">

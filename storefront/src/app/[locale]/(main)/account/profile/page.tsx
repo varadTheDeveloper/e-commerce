@@ -1,5 +1,6 @@
 import { retrieveCustomer } from "@lib/data/customer"
 import { getDictionary } from "@lib/i18n"
+import DeleteAccount from "@modules/account/components/delete-account"
 import ProfileForm from "@modules/account/components/profile-form"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -14,7 +15,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function Profile() {
   const customer = await retrieveCustomer()
   if (!customer) notFound()
-  return <ProfileForm customer={customer} />
+  return (
+    <>
+      <ProfileForm customer={customer} />
+      <DeleteAccount />
+    </>
+  )
 }
 
 export const dynamic = "force-dynamic"

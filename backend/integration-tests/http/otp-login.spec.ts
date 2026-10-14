@@ -28,12 +28,13 @@ medusaIntegrationTestRunner({
 
       const first = await login("9876543210", "123456")
       expect(first.status).toBe(200)
-      const signup = await api.post(
-        "/store/otp/account",
-        { first_name: "Asha" },
-        { headers: { ...headers, authorization: `Bearer ${first.data.token}` } }
-      )
+      const bearer = { headers: { ...headers, authorization: `Bearer ${first.data.token}` } }
+      // Must agree to the privacy policy
+      expect((await api.post("/store/otp/account", { first_name: "Asha" }, bearer).catch((e) => e.response)).status).toBe(400)
+      const signup = await api.post("/store/otp/account", { first_name: "Asha", privacy_consent: true }, bearer)
       expect(signup.data.customer).toMatchObject({ first_name: "Asha", phone: "+919876543210", email: null })
+      const customer = await getContainer().resolve(Modules.CUSTOMER).retrieveCustomer(signup.data.customer.id)
+      expect(customer.metadata?.privacy_consent).toMatchObject({ version: expect.any(String), at: expect.any(String) })
 
       // Next day: same number, new code, straight into the account
       const container = getContainer()
@@ -72,7 +73,7 @@ medusaIntegrationTestRunner({
       await request("9000000002")
       const { data } = await login("9000000002", "123456")
       const res = await api
-        .post("/store/otp/account", { first_name: "X", phone: "+919999999999" }, {
+        .post("/store/otp/account", { first_name: "X", privacy_consent: true, phone: "+919999999999" }, {
           headers: { ...headers, authorization: `Bearer ${data.token}` },
         })
         .catch((e) => e.response)
