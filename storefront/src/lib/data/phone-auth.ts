@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { forwardedFor } from "@lib/util/client-ip"
 import { updateTag } from "next/cache"
 import { getAuthHeaders, getCacheTag, setAuthToken } from "./cookies"
 import { transferCart } from "./customer"
@@ -57,6 +58,7 @@ export async function requestLoginCode(phone: string): Promise<{ ok: true; resen
   try {
     const res = await sdk.client.fetch<{ sent: boolean; resend_after: number }>("/store/otp/request", {
       method: "POST",
+      headers: await forwardedFor(),
       body: { phone },
     })
     return { ok: true, resendAfter: res.resend_after ?? 30 }

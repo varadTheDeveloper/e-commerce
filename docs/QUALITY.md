@@ -117,18 +117,21 @@ Every custom route was checked for login and ownership:
 - **Staff login:** after 10 wrong passwords for one email from one address in 15 minutes, login waits.
   Only failures count.
 
-### To do at deployment (Step 7c)
+### Deployment (Step 7c, `docs/EC2-SETUP.md`)
 
-- **Client addresses behind a proxy.** Rate limits key on the client address (`req.ip`). Behind a
-  load balancer or reverse proxy, Express must trust it (the `trust proxy` setting). Otherwise every
-  visitor looks like the proxy and shares one limit.
-- **S3 for return photos.** Use a private bucket with signed links. Today return photos get public,
-  unguessable URLs on local disk.
-- **Image hosts.** In `next.config.js`, remove `http://localhost` and Medusa's demo buckets from the
-  image hosts, and add the production image host.
-- **Admin access.** Serve the admin (`/app`) only over HTTPS, and add `X-Frame-Options` for it at the
-  proxy. If possible, allow the admin only from the office IP.
-- **Secrets.** Put them in AWS Secrets Manager. Turn on database backups.
+- **Client addresses behind a proxy: done.**
+  - Medusa trusts one proxy hop (Caddy).
+  - The website passes the visitor's address on for login codes and pincode checks.
+  - Caddy overwrites any address a visitor sends.
+  - Without this, every customer would have shared one limit of 10 login codes per 15 minutes.
+- **Image hosts: done.** They're set at build time; localhost and Medusa's demo buckets are gone on the server.
+- **Admin over HTTPS only, with `X-Frame-Options`: done** (Caddy).
+- **Test copy behind a demo password: done** (Caddy).
+- **Backups: done.** Nightly `pg_dump`, 14 kept, with an optional S3 copy.
+- **Still to do:**
+  - A private bucket with short links for return photos.
+  - Admin access limited to the office IP.
+  - Secrets in AWS Secrets Manager (today: chmod 600 files, as for Lexauraa).
 
 ### Known limits
 

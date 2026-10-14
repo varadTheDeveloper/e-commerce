@@ -3,12 +3,6 @@ const checkEnvVariables = require("./check-env-variables")
 checkEnvVariables()
 
 /**
- * Medusa Cloud-related environment variables
- */
-const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
-const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
-
-/**
  * Security headers on every page. No full Content-Security-Policy yet: Next.js
  * pages need inline scripts, and Razorpay's checkout loads its own scripts and frames.
  */
@@ -38,44 +32,24 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: false,
   },
+  // Docker image (deploy/storefront.Dockerfile): one self-contained server folder, .next/standalone.
+  // Elsewhere the usual build, so `next start` keeps working for development and CI.
+  ...(process.env.NEXT_OUTPUT === "standalone" ? { output: "standalone" } : {}),
   images: {
     remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        // Demo photos (Unsplash, free licence); remove once the brand's photos are in
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-public-images.s3.eu-west-1.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
-      },
-      ...(S3_HOSTNAME && S3_PATHNAME
-        ? [
-            {
-              protocol: "https",
-              hostname: S3_HOSTNAME,
-              pathname: S3_PATHNAME,
-            },
-          ]
-        : []),
+      // Local development and tests: photos served by the backend on localhost
+      ...(process.env.ALLOW_LOCALHOST_IMAGES === "false" ? [] : [{ protocol: "http", hostname: "localhost" }]),
+      // Demo photos (Unsplash, free licence); remove once the brand's photos are in
+      { protocol: "https", hostname: "images.unsplash.com" },
+      // Server: hosts of uploaded photos (S3 bucket or the API), comma-separated, set at build time
+      ...(process.env.IMAGE_HOSTS ?? "")
+        .split(",")
+        .map((h) => h.trim())
+        .filter(Boolean)
+        .map((hostname) => ({ protocol: "https", hostname })),
     ],
   },
 }

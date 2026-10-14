@@ -29,6 +29,15 @@ export function publicRequest(r: any) {
 }
 
 /** GET /store/orders/:id/returns — what can be returned or exchanged, and earlier requests. */
+/**
+ * The photo's permanent address. On S3 the file module hands out links that expire after an
+ * hour, so the bucket's public address is used instead (S3_FILE_URL, as in medusa-config.ts).
+ */
+function lastingFileUrl(key: string, url: string): string {
+  if (!process.env.S3_BUCKET || !process.env.S3_FILE_URL) return url
+  return `${process.env.S3_FILE_URL}/${key.split("/").map(encodeURIComponent).join("/")}`
+}
+
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const info = await eligibility(req.scope, req.params.id, req.auth_context.actor_id)
   if (!info) {
@@ -85,7 +94,7 @@ export const POST = async (req: AuthenticatedMedusaRequest<CreateReturnBody>, re
   for (const id of body.photos ?? []) {
     const file = await files.retrieveFile(id).catch(() => null)
     if (!id.startsWith(`returns/${req.auth_context.actor_id}/`) || !file?.url) return fail("invalid_photo", "Photo not found")
-    photos.push(file.url)
+    photos.push(lastingFileUrl(id, file.url))
   }
   if (body.items.some((i) => PHOTO_REASONS.includes(i.reason)) && !photos.length) {
     return fail("photo_required", "Add a photo of the damaged or wrong item")

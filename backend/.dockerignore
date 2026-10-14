@@ -1,0 +1,12 @@
+# Never in the image: secrets, local data, build output, tests
+.env
+.env.*
+node_modules
+.medusa
+static
+uploads
+coverage
+integration-tests
+.yarn/cache
+.yarn/install-state.gz
+*.log

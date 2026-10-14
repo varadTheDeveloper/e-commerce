@@ -1,0 +1,13 @@
+# Never in the image: secrets, local data, build output, tests
+.env
+.env.*
+node_modules
+.next
+coverage
+test-results
+playwright-report
+e2e
+.yarn/cache
+.yarn/install-state.gz
+*.log
+tsconfig.tsbuildinfo
