@@ -2,7 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { INDIAN_STATES, localMobile, MOBILE, PINCODE } from "@lib/india"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { getAuthHeaders, getCacheTag } from "./cookies"
 
 // Customer addresses in Indian format. Stored as Medusa addresses:
@@ -53,7 +53,7 @@ function toMedusa(a: AddressInput) {
 }
 
 async function done() {
-  revalidateTag(await getCacheTag("customers"))
+  updateTag(await getCacheTag("customers"))
 }
 
 /** Creates (id null) or updates an address. */

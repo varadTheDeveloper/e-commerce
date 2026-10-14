@@ -62,7 +62,7 @@ export default function CheckoutView({ cart, customer, settings, details, estima
   const [error, setError] = useState<{ code: CheckoutError; items?: string[] } | null>(null)
   const [choosing, setChoosing] = useState(false)
   const [adding, setAdding] = useState(false)
-  const [method, setMethod] = useState<Method>("online")
+  const [chosenMethod, setMethod] = useState<Method>("online")
   const [status, setStatus] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [cod, setCod] = useState<{ phone: string } | null>(null)
@@ -82,6 +82,8 @@ export default function CheckoutView({ cart, customer, settings, details, estima
   const codHere = !estimate?.checked || estimate.cod
   const withinCodLimit = !settings || total <= settings.cod_max_order
   const codAllowed = withinCodLimit && codHere
+  // Cash on delivery chosen, then no longer possible (bigger total, other pincode): pay online
+  const method: Method = !codAllowed && chosenMethod === "cod" ? "online" : chosenMethod
   const canPay = hasDelivery && serviceable
   const toFree = settings ? settings.free_shipping_from - itemTotal : 0
 
@@ -97,9 +99,6 @@ export default function CheckoutView({ cart, customer, settings, details, estima
     })
   }, [customer, shipping, router])
 
-  useEffect(() => {
-    if (!codAllowed && method === "cod") setMethod("online")
-  }, [codAllowed, method])
 
   const fail = (res: { error: CheckoutError; items?: string[] }) => {
     setStatus(null)

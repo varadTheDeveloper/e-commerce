@@ -26,6 +26,12 @@ export class RateLimiter {
     return 0
   }
 
+  /** Milliseconds to wait if the limit is reached, without counting a hit. */
+  check(key: string, now = Date.now()): number {
+    const bucket = this.buckets.get(createHash("sha256").update(key).digest("base64url").slice(0, 22))
+    return bucket && bucket.resetAt > now && bucket.count >= this.max ? bucket.resetAt - now : 0
+  }
+
   private sweep(now: number) {
     for (const [k, b] of this.buckets) if (b.resetAt <= now) this.buckets.delete(k)
     if (this.buckets.size >= this.maxKeys) this.buckets.clear()

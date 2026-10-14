@@ -1,6 +1,10 @@
 import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { uploadFilesWorkflow } from "@medusajs/medusa/core-flows"
 import { randomUUID } from "crypto"
+import { RateLimiter } from "../../../../lib/rate-limit"
+
+// A return takes at most 3 photos; this stops one account from filling the storage
+const perCustomer = new RateLimiter(20, 60 * 60 * 1000)
 
 /** Image types accepted, recognised by their first bytes (not the file name). */
 function imageType(buf: Buffer): { ext: string; mime: string } | null {
@@ -16,6 +20,10 @@ function imageType(buf: Buffer): { ext: string; mime: string } | null {
  * under the customer's own folder, so nobody can attach another customer's.
  */
 export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
+  const wait = perCustomer.hit(req.auth_context.actor_id)
+  if (wait) {
+    return res.status(429).json({ type: "too_many", message: "Too many photos. Please try again later.", retry_after: Math.ceil(wait / 1000) })
+  }
   const file = (req as any).file as { buffer: Buffer } | undefined
   if (!file?.buffer?.length) {
     return res.status(400).json({ type: "invalid_data", message: "No photo uploaded" })

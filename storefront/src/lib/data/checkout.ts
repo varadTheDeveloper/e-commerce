@@ -2,7 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
-import { revalidateTag } from "next/cache"
+import { updateTag } from "next/cache"
 import { getAuthHeaders, getCacheTag, getCartId, removeCartId } from "./cookies"
 import { retrieveCart } from "./cart"
 import { retrieveCustomer } from "./customer"
@@ -36,7 +36,7 @@ export async function getShopSettings(): Promise<ShopSettings> {
 }
 
 async function refreshCart() {
-  revalidateTag(await getCacheTag("carts"))
+  updateTag(await getCacheTag("carts"))
 }
 
 function errorFrom(e: unknown): Fail {
@@ -202,7 +202,7 @@ export async function placeOrder(kind: "online" | "cod" = "online"): Promise<{ o
     const res = await sdk.store.cart.complete(cartId, {}, await getAuthHeaders())
     await refreshCart()
     if (res.type === "order") {
-      revalidateTag(await getCacheTag("orders"))
+      updateTag(await getCacheTag("orders"))
       await removeCartId()
       return { ok: true, orderId: res.order.id }
     }

@@ -19,8 +19,12 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
   const track = useRef<HTMLDivElement>(null)
 
   // New colour = new picture set: start from the first one
-  useEffect(() => {
+  const [lastImages, setLastImages] = useState(images)
+  if (images !== lastImages) {
+    setLastImages(images)
     setActive(0)
+  }
+  useEffect(() => {
     track.current?.scrollTo({ left: 0 })
   }, [images])
 
@@ -100,7 +104,7 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
               src={src}
               alt={i === 0 ? alt : ""}
               fill
-              priority={i < 2}
+              // No priority here: it would make phones download these hidden pictures too
               sizes="(max-width: 1280px) 30vw, 420px"
               className="object-cover transition-transform duration-200"
               style={origin?.i === i ? { transform: "scale(1.7)", transformOrigin: origin.at } : undefined}

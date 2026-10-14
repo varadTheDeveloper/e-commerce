@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
-// Kept in sync with src/lib/i18n/config.ts (middleware runs on the edge, so it
-// avoids importing app code).
+// Kept in sync with src/lib/i18n/config.ts (the proxy, called middleware before
+// Next.js 16, runs before every page, so it stays small and imports no app code).
 const LOCALES = ["mr", "hi", "en"]
 const DEFAULT_LOCALE = "mr"
 const LOCALE_COOKIE = "_store_locale"
@@ -31,7 +31,7 @@ function preferredLocale(request: NextRequest): string {
  * to the preferred one. The choice is remembered in a cookie, and Medusa's
  * locale cookie is kept in step so carts are created in the same language.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const first = pathname.split("/")[1]?.toLowerCase()
 

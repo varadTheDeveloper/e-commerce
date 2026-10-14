@@ -2,7 +2,7 @@
 
 import { deleteMyAccount } from "@lib/data/customer"
 import { useI18n } from "@lib/i18n/provider"
-import { useState, useTransition } from "react"
+import { useState } from "react"
 
 /** "Delete my account" on the profile page (DPDP Act: right to erasure). */
 export default function DeleteAccount() {
@@ -11,14 +11,25 @@ export default function DeleteAccount() {
   const [open, setOpen] = useState(false)
   const [sure, setSure] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [pending, start] = useTransition()
+  const [pending, setPending] = useState(false)
 
   const remove = () => {
     setError(null)
-    start(async () => {
-      const res = await deleteMyAccount(locale)
-      if (res && !res.ok) setError(res.error === "open_orders" ? d.openOrders : d.failed)
-    })
+    setPending(true)
+    deleteMyAccount().then(
+      (res) => {
+        // A full page load: nothing of the deleted account stays in the browser
+        if (res.ok) window.location.assign(new URL(`/${locale}`, window.location.origin))
+        else {
+          setPending(false)
+          setError(res.error === "open_orders" ? d.openOrders : d.failed)
+        }
+      },
+      () => {
+        setPending(false)
+        setError(d.failed)
+      }
+    )
   }
 
   return (

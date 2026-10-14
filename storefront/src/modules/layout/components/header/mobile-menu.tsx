@@ -23,7 +23,11 @@ export default function MobileMenu({ categories }: { categories: NavCategory[] }
   const hrefFor = useLocaleHref()
 
   // Close when the page changes
-  useEffect(() => setOpen(false), [pathname])
+  const [lastPath, setLastPath] = useState(pathname)
+  if (pathname !== lastPath) {
+    setLastPath(pathname)
+    setOpen(false)
+  }
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : ""

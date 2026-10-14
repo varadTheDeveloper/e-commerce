@@ -9,7 +9,13 @@ export default async function CheckoutLayout(props: { children: React.ReactNode;
     <div className="min-h-screen w-full">
       <header className="border-b border-line bg-white">
         <nav className="content-container flex h-16 items-center justify-between">
-          <LocalizedClientLink href="/cart" prefetch={false} className="flex flex-1 basis-0 items-center gap-2 text-sm" data-testid="back-to-cart-link">
+          <LocalizedClientLink
+            href="/cart"
+            prefetch={false}
+            aria-label={t.checkout.backToBag}
+            className="flex flex-1 basis-0 items-center gap-2 text-sm"
+            data-testid="back-to-cart-link"
+          >
             <span aria-hidden>←</span>
             <span className="hidden small:inline">{t.checkout.backToBag}</span>
           </LocalizedClientLink>

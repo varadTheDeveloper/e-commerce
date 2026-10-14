@@ -9,7 +9,6 @@ import { useWishlist } from "@lib/wishlist"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
 const MAX_QTY = 10
@@ -47,7 +46,6 @@ export default function BagView({
   details: Record<string, LineDetails>
 }) {
   const { locale, t } = useI18n()
-  const router = useRouter()
   const wishlist = useWishlist()
   const [pending, start] = useTransition()
   const [busy, setBusy] = useState<string | null>(null)
@@ -62,8 +60,8 @@ export default function BagView({
     setBusy(lineId)
     start(async () => {
       try {
+        // The bag actions update the cart's cache tag (updateTag), which refreshes this page by itself
         await fn()
-        router.refresh()
       } catch {
         setError(t.bag.updateFailed)
       } finally {
@@ -106,7 +104,13 @@ export default function BagView({
               const image = d.image ?? item.thumbnail
               return (
                 <li key={item.id} className={`flex gap-4 py-5 ${lineBusy ? "opacity-60" : ""}`} data-testid="bag-item">
-                  <LocalizedClientLink href={`/products/${handle}`} className="relative aspect-[4/5] w-24 shrink-0 overflow-hidden bg-surface small:w-28">
+                  {/* Same link as the title: hidden from screen readers and the keyboard */}
+                  <LocalizedClientLink
+                    href={`/products/${handle}`}
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    className="relative aspect-[4/5] w-24 shrink-0 overflow-hidden bg-surface small:w-28"
+                  >
                     {image && <Image src={image} alt="" fill sizes="112px" className="object-cover" />}
                   </LocalizedClientLink>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">

@@ -121,6 +121,12 @@ in `storefront/src/config/seller.ts` are placeholders, and the pages show a "dra
 them. Customers agree to the privacy policy when they sign up, and can delete their account from their profile
 (orders are kept for tax records).
 
+## Quality
+
+Phone speed, accessibility and security checks, with results and what is left: `docs/QUALITY.md`.
+The browser tests include an accessibility check (axe), a keyboard-only purchase, a speed budget and one full
+"golden path" from search to refund.
+
 ## Secrets
 
 Keys live only in `.env` / `.env.local` files (git-ignored) and in AWS Secrets Manager in production.
